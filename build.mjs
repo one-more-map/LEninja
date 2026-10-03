@@ -31,20 +31,26 @@ if (packed) {
 const safe = s => JSON.stringify(s).replace(/</g, '\\u003c');
 // Item icons (from icons.mjs), trimmed to the items this data set uses
 let iconTag = '';
+// Known characters (friends etc.) that load instantly in "Your character" without the import script
+const knownFile = path.join(ROOT, 'data', 'known-characters.json');
+const known = fs.existsSync(knownFile) ? JSON.parse(fs.readFileSync(knownFile, 'utf8')) : [];
+const iconRows = [...rows, ...known];
 const iconFile = path.join(ROOT, 'data', 'icons.json');
 if (fs.existsSync(iconFile)) {
   const all = JSON.parse(fs.readFileSync(iconFile, 'utf8')), used = {};
-  rows.forEach(r => { if (r.e) Object.values(r.e).forEach(x => { if (all[x[1]]) used[x[1]] = all[x[1]]; }); (r.i || []).forEach(x => { if (all[x[1]]) used[x[1]] = all[x[1]]; }); });
+  iconRows.forEach(r => { if (r.e) Object.values(r.e).forEach(x => { if (all[x[1]]) used[x[1]] = all[x[1]]; }); (r.i || []).forEach(x => { if (all[x[1]]) used[x[1]] = all[x[1]]; }); });
   iconTag = `\n<script id="icons" type="application/json">${safe(used)}</script>`;
   console.log(`Embedding ${Object.keys(used).length} icons`);
 }
 const skillFile = path.join(ROOT, 'data', 'skill-icons.json');
 if (fs.existsSync(skillFile)) {
   const all = JSON.parse(fs.readFileSync(skillFile, 'utf8')), used = {};
-  rows.forEach(r => [...(r.sk || []), ...(r.sp || []).map(x => x[0]), ...(r.hb || [])].forEach(n => { if (all[n]) used[n] = all[n]; }));
+  iconRows.forEach(r => [...(r.sk || []), ...(r.sp || []).map(x => x[0]), ...(r.hb || [])].forEach(n => { if (all[n]) used[n] = all[n]; }));
   iconTag += `\n<script id="skill-icons" type="application/json">${safe(used)}</script>`;
   console.log(`Embedding ${Object.keys(used).length} skill icons`);
 }
+if (known.length) { iconTag += `
+<script id="known" type="application/json">${safe(known)}</script>`; console.log(`Embedding ${known.length} known character(s)`); }
 const html = fs.readFileSync(path.join(ROOT, templateName), 'utf8')
   .replace('<!--DATA-->', `<script id="meta" type="application/json">${safe(meta)}</script>\n<script id="data" type="application/json">${safe(rows)}</script>${iconTag}`);
 // Make the output pure ASCII so no host can mis-decode it (UTF-8 read as Latin-1 shows "Â·").

@@ -863,7 +863,7 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
     const inLadder = ROWS.find(isMe);
     who.replaceChildren(
       el('span', {}, el('b', {}, state.me.c), ' · ', state.me.a, state.me.l ? ` · level ${state.me.l}` : '',
-        el('span', {class:'src'}, inLadder ? `  rank #${inLadder.r} in this list` : '  imported from lastepochtools')),
+        el('span', {class:'src'}, inLadder ? `  rank #${inLadder.r} in this list` : state.me.src === 'known' ? `  saved on LE Ninja${state.me.scrapedAt ? ' ' + state.me.scrapedAt : ''}` : '  imported from lastepochtools')),
       el('label', {class:'toggle'}, el('input', {type:'checkbox', id:'me-dim', ...(state.dim ? {checked:''} : {}), onchange:e => { state.dim = e.target.checked; renderRows(ROWS.filter(matches)); }}), 'Dim what I already have'),
       el('button', {type:'button', class:'linkbtn', onclick:clearMe}, 'Change character'));
 
@@ -925,6 +925,9 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
       if (!p) { box.hidden = false; document.getElementById('me-import-msg').textContent = 'That doesn\'t look like a lastepochtools character link. It should look like lastepochtools.com/profile/Name/character/CharacterName.'; return; }
       const r = ROWS.find(x => meKey(x.a, x.c) === meKey(p.a, p.c));
       if (r && !r.ng) return setMe({a:r.a, c:r.c, l:r.l, e:r.e, i:r.i, sp:r.sp, sk:r.sk, hb:r.hb}, 'ladder');
+      const kEl = document.getElementById('known');
+      const kn = kEl ? JSON.parse(kEl.textContent).find(x => meKey(x.a, x.c) === meKey(p.a, p.c)) : null;
+      if (kn) return setMe(kn, 'known');
       document.getElementById('me-open').href = `https://www.lastepochtools.com/profile/${encodeURIComponent(p.a)}/character/${encodeURIComponent(p.c)}`;
       document.getElementById('me-import-msg').textContent = r ? `${p.c} is in this list but lastepochtools hasn't imported their gear. Import it yourself:` : `${p.c} isn't in this ladder slice, so import it from lastepochtools:`;
       box.hidden = false;
