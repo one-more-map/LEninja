@@ -1,9 +1,9 @@
 // Turns a full browser export (data/full.packed.json) into the dataset, and updates the
 // item sprite list, skill sprite list and LP odds so icons.mjs / build.mjs pick up new items.
-//   node unpack-full.cjs data/<dataset>.json
+//   node unpack-full.cjs data/<dataset>.json [data/<export>.packed.json]
 const fs = require('fs');
 const OUT = process.argv[2];
-const P = JSON.parse(fs.readFileSync('data/full.packed.json', 'utf8'));
+const P = JSON.parse(fs.readFileSync(process.argv[3] || 'data/full.packed.json', 'utf8'));
 const s = P.s;
 const mod = m => [s[m[0]], m[1]];
 const item = x => {
@@ -33,10 +33,10 @@ const odds = JSON.parse(fs.readFileSync('data/lp-odds.json', 'utf8'));
 Object.assign(odds, P.odds);
 fs.writeFileSync('data/lp-odds.json', JSON.stringify(odds));
 
-const meta = {
+// Build details come from the export (P.meta); the first export predates that, so it falls back to Spellblade
+const meta = Object.assign({
   season: 'Season 5: Rage of the Frostborn / Softcore / Corruption Ladder', cycle: 'rage-of-the-frostborn', mode: 'softcore-1p', board: 'corruption',
-  baseClass: 'Mage', mastery: 'Spellblade', skills: ['Surge', 'Firebrand'], pages: 4, total: rows.length,
-  scrapedAt: P.scrapedAt, lpOdds: odds, lpArea: 100,
-};
+  baseClass: 'Mage', mastery: 'Spellblade', skills: ['Surge', 'Firebrand'], pages: 4,
+}, P.meta || {}, { total: rows.length, scrapedAt: P.scrapedAt, lpOdds: odds, lpArea: 100 });
 fs.writeFileSync(OUT, JSON.stringify({ meta, rows }));
 console.log(`${rows.length} characters, ${rows.filter(r => !r.ng).length} with gear; ${Object.keys(P.spr).length} item sprites, ${Object.keys(P.odds).length} unique odds`);

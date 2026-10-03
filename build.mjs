@@ -33,7 +33,7 @@ const safe = s => JSON.stringify(s).replace(/</g, '\\u003c');
 let iconTag = '';
 // Known characters (friends etc.) that load instantly in "Your character" without the import script
 const knownFile = path.join(ROOT, 'data', 'known-characters.json');
-const known = fs.existsSync(knownFile) ? JSON.parse(fs.readFileSync(knownFile, 'utf8')) : [];
+const known = (fs.existsSync(knownFile) ? JSON.parse(fs.readFileSync(knownFile, 'utf8')) : []).filter(k => !k.cls || !meta.cls || k.cls === meta.cls);
 const iconRows = [...rows, ...known];
 const iconFile = path.join(ROOT, 'data', 'icons.json');
 if (fs.existsSync(iconFile)) {
