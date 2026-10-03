@@ -1,0 +1,629 @@
+<title>LE Ninja Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: in-game Last Epoch inventory language — warm black panels in double bronze frames, crimson banner tabs, rarity-filled item slots, the real inventory paperdoll and a framed hotbar tray. Deliberately dark-only, like the game. */
+:root{
+  color-scheme:dark;
+  --void:#0a0908; --panel:#121110; --panel-2:#181614; --raised:#211d19; --line:#2d2822; --slot:#0c0b0a;
+  --bronze:#7a6238; --bronze-dk:#3e3220; --gold:#c8a463; --gold-hi:#ecdcae; --cream:#e6dcc6;
+  --crimson:#6e1a15; --crimson-hi:#a52c24; --vine:#2c4436; --frost:#8fd3e0;
+  --text:#e6dcc6; --dim:#9d917f; --faint:#665d51;
+  --r-rare:#e9cf4a; --r-exalted:#a274ff; --r-unique:#ef8b34; --r-set:#5ccf68; --r-legendary:#e8503c;
+  --f-mg:#e2ad4d; --f-cof:#7fa8f0;
+  --rift:var(--gold); --rift-dim:var(--bronze-dk);
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --ui:"Alegreya Sans","Gill Sans",system-ui,sans-serif;
+  --body:"Alegreya Sans","Gill Sans",system-ui,sans-serif;
+  /* bronze corner studs for framed panels */
+  --studs:
+    radial-gradient(circle,var(--gold) 0 2px,var(--bronze-dk) 2.5px 3.5px,transparent 4px) top 3px left 3px/9px 9px,
+    radial-gradient(circle,var(--gold) 0 2px,var(--bronze-dk) 2.5px 3.5px,transparent 4px) top 3px right 3px/9px 9px,
+    radial-gradient(circle,var(--gold) 0 2px,var(--bronze-dk) 2.5px 3.5px,transparent 4px) bottom 3px left 3px/9px 9px,
+    radial-gradient(circle,var(--gold) 0 2px,var(--bronze-dk) 2.5px 3.5px,transparent 4px) bottom 3px right 3px/9px 9px;
+  --flourish:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 16'%3E%3Cg fill='none' stroke='%23c8a463' stroke-width='1'%3E%3Cpath d='M2 12h38c8 0 10-8 18-8s10 8 18 8h42'/%3E%3Cpath d='M52 12c2-5 5-7 8-7s6 2 8 7' stroke-width='.8'/%3E%3Ccircle cx='60' cy='4' r='2.2' fill='%23c8a463'/%3E%3Cpath d='M30 12c-4-4-9-4-12 0M90 12c4-4 9-4 12 0' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{background:var(--void)}
+body{background:var(--void);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.35;
+  background-image:radial-gradient(1000px 500px at 50% -200px,rgba(165,44,36,.14),transparent 70%)}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Crimson banner tab (shared by nav, faction switch, sort) */
+.nav span,.seg button,.sort button{position:relative;font-family:var(--display);font-weight:600;letter-spacing:.06em;color:var(--dim);
+  background:linear-gradient(180deg,#2a1210,#140807);border:1px solid #4a231c;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);cursor:pointer}
+.nav span.on,.seg button[aria-pressed="true"],.sort button[aria-pressed="true"]{color:var(--gold-hi);background:linear-gradient(180deg,#8e2a22,#4c1410 70%,#2a0b09);border-color:var(--gold);text-shadow:0 1px 2px #000}
+.seg button:hover,.sort button:hover{color:var(--cream)}
+
+/* Top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(180deg,#14110e,#0b0a09);border-bottom:1px solid var(--bronze);box-shadow:0 1px 0 #000,0 2px 0 var(--bronze-dk)}
+.bar-in{max-width:1400px;margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;letter-spacing:.08em;font-size:17px;color:var(--gold-hi)}
+.nav{display:flex;gap:4px;margin:0 auto}
+.nav span{display:flex;align-items:center;padding:7px 26px;font-size:13px}
+.bar .note{font-family:var(--ui);font-size:13px;color:var(--faint);white-space:nowrap}
+@media (max-width:760px){.bar .note,.nav span:not(.on){display:none}.nav{margin:0}}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;text-align:center;padding:28px 16px 30px;border-bottom:1px solid var(--bronze-dk);
+  background:radial-gradient(520px 200px at 50% 60%,rgba(200,164,99,.10),transparent 70%)}
+.hero svg.dial{position:absolute;left:50%;top:50%;width:560px;height:560px;transform:translate(-50%,-50%);opacity:.16;pointer-events:none}
+.hero svg.shard{display:none}
+.hero > *:not(svg){position:relative}
+.eyebrow{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+h1{margin:8px 0 0;font-family:var(--display);font-weight:600;line-height:1;text-wrap:balance}
+h1 .who{display:block;font-size:clamp(32px,5.5vw,54px);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-hi);text-shadow:0 2px 0 #000,0 0 22px rgba(200,164,99,.25)}
+h1 .what{display:block;margin:14px auto 0;padding-top:16px;max-width:520px;font-size:clamp(15px,2.2vw,20px);letter-spacing:.14em;text-transform:uppercase;color:var(--frost);background:var(--flourish) top center/240px 16px no-repeat}
+.tags{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tag{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border:1px solid var(--line);color:var(--dim);background:var(--panel)}
+
+.wrap{max-width:1400px;margin:0 auto;padding:18px 16px 56px}
+
+/* Double bronze frame with corner studs */
+.frame{position:relative;border:1px solid var(--bronze);border-radius:2px;background:var(--studs),linear-gradient(180deg,var(--panel-2),var(--panel));background-repeat:no-repeat;
+  box-shadow:inset 0 0 0 3px var(--panel),inset 0 0 0 4px var(--bronze-dk),0 2px 10px rgba(0,0,0,.6)}
+
+/* Summary strip */
+.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.4fr) minmax(0,1.4fr);gap:10px;margin-bottom:14px}
+@media (max-width:1000px){.strip{grid-template-columns:repeat(3,minmax(0,1fr))}.strip .wide{grid-column:span 3}}
+@media (max-width:560px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.strip .wide{grid-column:1/-1}}
+.stat{padding:12px 14px;text-align:center;min-width:0}
+.stat .k{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.stat .v{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.15;color:var(--gold-hi);font-variant-numeric:tabular-nums;text-shadow:0 2px 0 #000}
+.stat .s{font-family:var(--ui);font-size:12px;color:var(--faint)}
+.split{display:flex;height:16px;overflow:hidden;background:var(--slot);border:1px solid var(--line);margin-top:8px;font-family:var(--ui);font-size:11px;font-weight:800;color:#160f06}
+.split i{display:flex;align-items:center;justify-content:center;font-style:normal;height:100%;min-width:0;overflow:hidden}
+.split-l{display:flex;justify-content:space-between;gap:10px;font-family:var(--ui);font-size:12px;color:var(--dim);margin-top:5px}
+.hist svg{display:block;width:100%;height:50px;margin-top:6px}
+.hist svg rect[fill="var(--rift)"]{fill:var(--gold)}
+
+/* Active filters */
+.active{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:30px;margin-bottom:10px;font-family:var(--ui)}
+.active .lbl{font-family:var(--display);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-right:4px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bronze);background:var(--panel-2);padding:2px 8px 2px 3px;font-size:14px;font-weight:600;cursor:pointer}
+.pill .ic,.pill .sic{--s:22px}
+.pill small{color:var(--dim);font-weight:500}
+.pill:hover{border-color:var(--gold)}
+.clear{background:none;border:0;color:var(--gold);font-size:14px;cursor:pointer;padding:3px 6px}
+.clear:hover{text-decoration:underline}
+
+.grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+/* Item slot: filled with its rarity colour, bevelled like the game */
+.ic{position:relative;flex:none;display:inline-grid;place-items:center;width:var(--s,36px);height:var(--s,36px);padding:0;border:1px solid #3b342a;border-radius:2px;
+  background:linear-gradient(170deg,color-mix(in srgb,var(--c) 42%,var(--slot)) 0%,color-mix(in srgb,var(--c) 14%,var(--slot)) 55%,var(--slot) 100%);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08)}
+.ic img{width:90%;height:90%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.9))}
+.ic .nog{font-family:var(--display);font-size:calc(var(--s,36px) * .38);color:var(--c)}
+.ic.cor::after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;transform:rotate(45deg);background:var(--r-legendary);box-shadow:0 0 4px var(--r-legendary)}
+.ic.leg{border-color:color-mix(in srgb,var(--r-legendary) 55%,#000)}
+button.ic{cursor:pointer}
+button.ic:hover{border-color:var(--gold);filter:brightness(1.15)}
+
+/* Filter rail */
+aside{min-width:0}
+.rail{padding:14px 12px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin:10px 0}
+.seg button{padding:5px 8px;font-size:10.5px;line-height:1.2}
+.seg button small{display:block;font-family:var(--ui);font-size:12px;font-weight:600;color:inherit;opacity:.75}
+.search{position:relative;display:block}
+.search input{width:100%;font:inherit;font-family:var(--ui);font-size:14px;padding:6px 10px 6px 30px;border:1px solid var(--line);background:var(--slot);color:var(--text);box-shadow:inset 0 1px 3px #000}
+.search input::placeholder{color:var(--faint)}
+.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.check{display:flex;gap:8px;align-items:center;font-family:var(--ui);font-size:14px;color:var(--dim);cursor:pointer}
+.check input{accent-color:var(--crimson-hi)}
+.sec{margin-top:14px}
+.sec h3{display:flex;align-items:center;justify-content:space-between;margin:0 0 6px;padding:4px 8px;background:linear-gradient(90deg,#2a1210,transparent);border-left:2px solid var(--crimson-hi);font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-hi)}
+.sec h3 span{font-family:var(--ui);font-size:12px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--faint)}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 8px;align-items:center;width:100%;text-align:left;padding:3px 4px;border:0;background:none;cursor:pointer;font-family:var(--ui)}
+.opt .ic,.opt .sic{--s:30px;grid-row:span 2}
+.opt .sic{pointer-events:none}
+.opt .nm{font-size:15px;font-weight:600;color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:end}
+.opt .nm small{font-size:11px;font-weight:500;color:var(--dim);margin-left:5px}
+.opt .pc{font-size:14px;color:var(--dim);font-variant-numeric:tabular-nums;grid-row:span 2}
+.opt .br{height:3px;background:var(--slot);overflow:hidden;align-self:start}
+.opt .br i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,color-mix(in srgb,var(--c) 50%,#000),var(--c));transition:width .25s ease}
+.opt:hover{background:var(--panel-2)}
+.opt.on{background:linear-gradient(90deg,rgba(165,44,36,.28),transparent);box-shadow:inset 2px 0 0 var(--crimson-hi)}
+.opt.on .pc{color:var(--cream)}
+.more{display:block;width:100%;text-align:center;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);background:none;border:0;padding:5px;cursor:pointer}
+.more:hover{color:var(--gold-hi)}
+.empty-opt{padding:6px 4px;font-family:var(--ui);font-size:13px;color:var(--faint)}
+
+/* Ladder table */
+main{min-width:0}
+.tbl{overflow-x:auto;padding:4px}
+.tbl-h{display:flex;align-items:center;gap:14px;padding:10px 12px;border-bottom:1px solid var(--bronze-dk);flex-wrap:wrap;background:var(--flourish) bottom center/200px 12px no-repeat}
+.tbl-h .t{font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-hi)}
+.sort{display:flex;gap:2px;margin-left:auto;align-items:center}
+.sort span{font-family:var(--ui);font-size:13px;color:var(--faint);margin-right:6px}
+.sort button{padding:4px 16px;font-size:11px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr.row{cursor:pointer}
+tbody tr.row:hover td{background:rgba(200,164,99,.04)}
+tbody tr.row.open td{background:linear-gradient(90deg,rgba(165,44,36,.18),rgba(165,44,36,.04));border-bottom-color:transparent}
+tbody tr.row.open td:first-child{box-shadow:inset 2px 0 0 var(--crimson-hi)}
+.n{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rank{color:var(--dim)}
+.who{min-width:160px}
+.who .c{font-family:var(--ui);font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--cream)}
+.who .c svg{color:var(--faint);flex:none;transition:transform .2s}
+tr.open .who .c svg{transform:rotate(90deg);color:var(--gold)}
+.who .a{font-family:var(--ui);font-size:13px;color:var(--dim);display:flex;align-items:center;gap:6px;margin-left:18px}
+.fac{font-weight:700;font-size:11px;padding:0 5px;border:1px solid currentColor;line-height:15px}
+.fac.mg{color:var(--f-mg)} .fac.cof{color:var(--f-cof)}
+.corr{display:flex;align-items:center;gap:8px;min-width:100px}
+.corr b{font-family:var(--display);font-size:15px;font-weight:600;color:var(--gold-hi);font-variant-numeric:tabular-nums;width:34px}
+.corr i{display:block;height:4px;width:52px;background:var(--slot);border:1px solid var(--line);overflow:hidden}
+.corr i::after{content:"";display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--crimson),var(--crimson-hi) 60%,var(--gold))}
+
+/* Skills: square tiles in a hotbar tray; off-bar specialisations as round icons */
+.skill-strip{display:flex;align-items:center;gap:8px;min-width:230px}
+.tray{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--bronze-dk);background:linear-gradient(180deg,#1a1714,#0d0c0b);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 #000}
+.skill-strip .sep{display:none}
+.sic{position:relative;flex:none;display:inline-grid;place-items:center;width:var(--s,32px);height:var(--s,32px);padding:0;border:1px solid #4a3f2c;background:var(--slot);cursor:pointer;border-radius:2px}
+.sic img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.sic .nog{font-family:var(--display);font-size:calc(var(--s,32px) * .4);color:var(--dim)}
+.sic b{position:absolute;right:-1px;bottom:-1px;min-width:15px;padding:0 2px;background:rgba(10,9,8,.92);border:1px solid var(--bronze);font-family:var(--display);font-size:9.5px;font-weight:700;line-height:12px;color:var(--gold-hi);text-align:center}
+.sic.both{border-color:var(--bronze)}
+.sic.both.hl{border-color:var(--gold);box-shadow:0 0 0 1px rgba(200,164,99,.35),0 0 6px rgba(200,164,99,.35)}
+.sic.bar img{filter:saturate(.75) brightness(.9)}
+.sic.bar::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.6)}
+.sic.spec,.sic.lad{border-radius:50%;border-color:var(--bronze-dk);--s:28px}
+.sic.spec{opacity:.6}
+.sic.spec b,.sic.lad b{right:-6px;bottom:-5px}
+.sic:hover{filter:brightness(1.2)}
+.sk-legend{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-family:var(--ui);font-size:13px;color:var(--faint)}
+.sk-legend > span{display:inline-flex;align-items:center;gap:6px}
+.sk-legend .sic{--s:20px;cursor:default}
+.sk-legend .sic b{display:none}
+.namechip{display:inline-flex;align-items:center;gap:6px;padding:1px 8px 1px 1px;border:1px solid var(--line);background:var(--panel-2);font-family:var(--ui);font-size:13px;font-weight:600;color:var(--c,var(--cream));cursor:pointer;white-space:nowrap}
+.namechip:hover{border-color:var(--bronze)}
+.namechip .sic,.namechip .ic{--s:24px}
+.namechip .sic b{display:none}
+.namechip .lv{font-family:var(--display);color:var(--gold-hi);font-size:11px}
+.namechip.spec{opacity:.65;border-style:dashed}
+.namechip.bar{font-style:italic}
+.names .skill-strip,.names .strip-ic{flex-wrap:wrap;gap:4px}
+.names .tray{display:contents}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-family:var(--ui);font-size:14px;color:var(--dim);cursor:pointer}
+.toggle input{accent-color:var(--crimson-hi)}
+.strip-ic{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:340px}
+.strip-ic .hid{font-family:var(--ui);font-size:12px;font-weight:600;color:var(--faint);padding:2px 6px;border:1px dashed var(--line);white-space:nowrap}
+.nogear{font-family:var(--ui);font-size:14px;color:var(--faint);font-style:italic}
+tr.dim .who .c,tr.dim .n{color:var(--faint)}
+.empty{padding:40px 16px;text-align:center;color:var(--dim);font-family:var(--ui)}
+
+/* Expanded: the real inventory layout */
+tr.detail td{padding:0 12px 14px;background:rgba(165,44,36,.04)}
+.doll-wrap{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:24px;padding:18px;border:1px solid var(--bronze);
+  background:var(--studs),radial-gradient(420px 260px at 18% 50%,rgba(200,164,99,.06),transparent 70%),#0d0c0b;background-repeat:no-repeat;box-shadow:inset 0 0 0 3px #0d0c0b,inset 0 0 0 4px var(--bronze-dk)}
+@media (max-width:1100px){.doll-wrap{grid-template-columns:auto minmax(0,1fr)}.idols{grid-column:1/-1}}
+@media (max-width:620px){.doll-wrap{grid-template-columns:1fr}}
+.doll{display:grid;grid-template-columns:62px 84px 62px;grid-template-rows:74px 150px 50px 74px;gap:8px;
+  grid-template-areas:". head amulet" "weapon1 chest weapon2" "ring1 waist ring2" "hands feet relic"}
+.doll .slot{width:100%;height:100%}
+.doll [data-slot="amulet"],.doll [data-slot="ring1"],.doll [data-slot="ring2"]{width:50px;height:50px;place-self:center}
+.doll .slot.empty{border:1px solid var(--line);background:var(--slot);box-shadow:inset 0 1px 4px #000}
+.panel-h{margin:0 0 10px;padding:4px 8px;background:linear-gradient(90deg,#2a1210,transparent);border-left:2px solid var(--crimson-hi);font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-hi)}
+.list{display:flex;flex-direction:column;gap:6px;list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:center;gap:9px;min-width:0}
+.list .ic{--s:30px}
+.list .t{min-width:0;font-family:var(--ui);line-height:1.15}
+.list .t b{display:block;font-size:15px;font-weight:700;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list .t small{font-size:12px;color:var(--dim)}
+.idol-grid{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border:1px solid var(--line);background:var(--slot);box-shadow:inset 0 1px 4px #000}
+.idol-grid .ic{--s:46px}
+.ext{display:inline-block;margin-top:12px;font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--gold);text-decoration:none}
+.ext:hover{color:var(--gold-hi)}
+
+footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--bronze-dk);font-size:14px;color:var(--dim);max-width:82ch}
+footer h2{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-hi);margin:0 0 6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-chev" viewBox="0 0 16 16"><path d="m6 3.5 4.5 4.5L6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="brand">
+      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#c9a45c" stroke-width="1.2"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="#62d6ea" stroke-width=".8" stroke-dasharray="1.5 2.4"/><path d="M12 5.5V12l4 2.6" fill="none" stroke="#efd59a" stroke-width="1.6" stroke-linecap="round"/></svg>
+      LE NINJA
+    </span>
+    <nav class="nav" aria-label="Sections"><span class="on">BUILDS</span><span>UNIQUES</span><span>LADDERS</span></nav>
+    <span class="note" id="snap"></span>
+  </div>
+</div>
+
+<header class="hero">
+  <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
+    <g fill="none" stroke="#c9a45c">
+      <circle cx="100" cy="100" r="96" stroke-width=".5"/><circle cx="100" cy="100" r="88" stroke-width=".3"/>
+      <circle cx="100" cy="100" r="62" stroke-width=".4" stroke-dasharray="1 3"/><circle cx="100" cy="100" r="40" stroke-width=".3"/>
+    </g>
+    <g id="ticks" stroke="#c9a45c" stroke-width=".6"></g>
+  </svg>
+  <svg class="shard l" viewBox="0 0 340 300" preserveAspectRatio="xMinYMid slice" aria-hidden="true">
+    <defs><linearGradient id="fg" x1="0" x2="1"><stop offset="0" stop-color="#a9e6f2" stop-opacity=".35"/><stop offset="1" stop-color="#a9e6f2" stop-opacity="0"/></linearGradient></defs>
+    <g fill="url(#fg)"><path d="M0 40 150 120 0 150z"/><path d="M0 120 230 170 0 210z" opacity=".7"/><path d="M0 0 90 60 0 80z" opacity=".6"/><path d="M0 220 120 240 0 300z" opacity=".5"/></g>
+  </svg>
+  <svg class="shard r" viewBox="0 0 340 300" preserveAspectRatio="xMinYMid slice" aria-hidden="true">
+    <g fill="url(#fg)"><path d="M0 40 150 120 0 150z"/><path d="M0 120 230 170 0 210z" opacity=".7"/><path d="M0 0 90 60 0 80z" opacity=".6"/><path d="M0 220 120 240 0 300z" opacity=".5"/></g>
+  </svg>
+  <div class="eyebrow" id="eyebrow">Last Epoch ladder</div>
+  <h1 id="h1"><span class="who">Builds</span></h1>
+  <div class="tags" id="tags"></div>
+</header>
+
+<div class="wrap">
+  <section class="strip" aria-label="Summary">
+    <div class="stat frame"><div class="k">Characters</div><div class="v" id="s-n">0</div><div class="s" id="s-g"></div></div>
+    <div class="stat frame"><div class="k">Top corruption</div><div class="v" id="s-max">0</div><div class="s">highest shown</div></div>
+    <div class="stat frame"><div class="k">Median corruption</div><div class="v" id="s-med">0</div><div class="s">of shown</div></div>
+    <div class="stat frame wide"><div class="k">Trade faction</div><div class="split" id="s-split"></div><div class="split-l" id="s-split-l"></div></div>
+    <div class="stat frame wide hist"><div class="k">Corruption spread</div><svg id="s-hist" viewBox="0 0 300 56" preserveAspectRatio="none" role="img" aria-label="Histogram of corruption for shown characters"></svg></div>
+  </section>
+
+  <div class="active" id="active" aria-live="polite"></div>
+
+  <div class="grid">
+    <aside class="frame rail">
+      <label class="search"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 10.5 3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input type="search" id="q" placeholder="Search items or skills" aria-label="Search items or skills"></label>
+      <div class="seg" id="seg" role="group" aria-label="Trade faction">
+        <button type="button" data-f="all" aria-pressed="true">All<small id="c-all"></small></button>
+        <button type="button" data-f="mg" aria-pressed="false">Merchant's Guild<small id="c-mg"></small></button>
+        <button type="button" data-f="cof" aria-pressed="false">Circle of Fortune<small id="c-cof"></small></button>
+      </div>
+      <label class="check"><input type="checkbox" id="bases"> Include rare &amp; exalted bases</label>
+      <div id="slots"></div>
+    </aside>
+
+    <main class="frame tbl">
+      <div class="tbl-h">
+        <span class="t">Characters</span>
+        <span class="sk-legend" id="sk-legend" aria-label="Skill legend"></span>
+        <label class="toggle"><input type="checkbox" id="names"> Show names</label>
+        <div class="sort" id="sort" role="group" aria-label="Sort by"><span>Sort</span><button type="button" data-s="r" aria-pressed="true">Rank</button><button type="button" data-s="l" aria-pressed="false">Level</button></div>
+      </div>
+      <table>
+        <thead><tr><th>Rank</th><th>Character</th><th>Level</th><th>Corruption</th><th>Skills</th><th>Equipment</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </main>
+  </div>
+
+  <footer>
+    <h2>About this data</h2>
+    <p>Rank, corruption and skills come from the public lastepochtools ladder file. Gear, trade faction and item art come from lastepochtools profiles and its item database; item art belongs to Eleventh Hour Games. <span id="ng-note"></span> Usage percentages count only characters with gear that match your current filters. A red dot on an icon means the item is corrupted; a red underline marks a legendary.</p>
+  </footer>
+</div>
+
+<!--DATA-->
+
+<script>
+(function(){
+  const fix = s => s.replace(/''/g, "'").trim();
+  const ROWS = JSON.parse(document.getElementById('data').textContent).map(r => {
+    if (r.e) for (const k in r.e) r.e[k][1] = fix(r.e[k][1]);
+    if (r.i) r.i.forEach(x => x[1] = fix(x[1]));
+    return r;
+  });
+  const META = JSON.parse(document.getElementById('meta').textContent);
+  const iconEl = document.getElementById('icons');
+  const ICONS = iconEl ? JSON.parse(iconEl.textContent) : {};
+  const skEl = document.getElementById('skill-icons');
+  const SKICONS = skEl ? JSON.parse(skEl.textContent) : {};
+  const FKEY = {0:'cof', 1:'mg'}, FNAME = {mg:"Merchant's Guild", cof:'Circle of Fortune'}, FSHORT = {mg:'MG', cof:'CoF'};
+  ROWS.forEach(r => { const f = r.f; r.f = f ? FKEY[f[0]] : null; r.fr = f ? f[1] : null; });
+  const MAXC = Math.max(1, ...ROWS.map(r => r.s));
+  const MINC = Math.min(...ROWS.map(r => r.s));
+  const HL = new Set(META.skills || []);
+  const PAGE = 100;
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  // Header from scrape metadata
+  (function(){
+    const [season, mode, board] = (META.season || '').split(' / ');
+    const who = META.mastery || META.baseClass;
+    document.title = `${who}${META.skills.length ? ' ' + META.skills.join(' + ') : ''} · LE Ninja`;
+    document.getElementById('eyebrow').textContent = [season, mode, (board || '').replace(/ Ladder$/, '')].filter(Boolean).join(' · ');
+    const h1 = document.getElementById('h1');
+    h1.innerHTML = '';
+    const a = document.createElement('span'); a.className = 'who'; a.textContent = who; h1.append(a);
+    const b = document.createElement('span'); b.className = 'what'; b.textContent = META.skills.length ? META.skills.join(' · ') : 'All builds'; h1.append(b);
+    const tags = document.getElementById('tags');
+    [META.baseClass, `Top ${META.total} characters`, `${META.pages} ladder page${META.pages === 1 ? '' : 's'}`].forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); });
+    const d = new Date(META.scrapedAt);
+    document.getElementById('snap').textContent = 'Data scraped ' + d.toLocaleString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    const ng = ROWS.filter(r => r.ng).length;
+    document.getElementById('ng-note').textContent = ng ? `${ng} of these ${ROWS.length} characters have never been imported by lastepochtools, so they have no gear or faction and drop out when you filter by an item or a faction.` : '';
+    const ticks = document.getElementById('ticks');
+    for (let i = 0; i < 60; i++) {
+      const l = document.createElementNS(svgNS, 'line'), a = i / 60 * Math.PI * 2, r1 = i % 5 ? 92 : 84;
+      l.setAttribute('x1', 100 + Math.cos(a) * r1); l.setAttribute('y1', 100 + Math.sin(a) * r1);
+      l.setAttribute('x2', 100 + Math.cos(a) * 96); l.setAttribute('y2', 100 + Math.sin(a) * 96);
+      ticks.append(l);
+    }
+  })();
+
+  const one = x => x ? [x] : [];
+  // Specialised skills come from the profile (with level); characters without a profile fall back to the ladder's list
+  ROWS.forEach(r => { r.spn = r.sp ? r.sp.map(x => x[0]) : r.sk; });
+  const SLOTS = [
+    {id:'skills', label:'Specialised skills', skill:true, all:true, get:r => r.spn.map(n => ['k', n])},
+    {id:'hotbar', label:'Hotbar', skill:true, get:r => (r.hb || []).map(n => ['k', n])},
+    {id:'weapon1', label:'Main hand', get:r => one(r.e.weapon1)},
+    {id:'weapon2', label:'Off hand', get:r => one(r.e.weapon2)},
+    {id:'head', label:'Helmet', get:r => one(r.e.head)},
+    {id:'chest', label:'Body armour', get:r => one(r.e.chest)},
+    {id:'hands', label:'Gloves', get:r => one(r.e.hands)},
+    {id:'waist', label:'Belt', get:r => one(r.e.waist)},
+    {id:'feet', label:'Boots', get:r => one(r.e.feet)},
+    {id:'rings', label:'Rings', get:r => [r.e.ring1, r.e.ring2].filter(Boolean)},
+    {id:'amulet', label:'Amulet', get:r => one(r.e.amulet)},
+    {id:'relic', label:'Relic', get:r => one(r.e.relic)},
+    {id:'idol_altar', label:'Idol altar', get:r => one(r.e.idol_altar)},
+    {id:'idols', label:'Idols', get:r => r.i || []},
+  ];
+  const SLOT = Object.fromEntries(SLOTS.map(s => [s.id, s]));
+  const EQUIP = ['weapon1','weapon2','head','chest','hands','waist','feet','ring1','ring2','amulet','relic'];
+  const SLOT_OF = k => k.startsWith('ring') ? 'rings' : k;
+  const SLOT_LABEL = {weapon1:'Main hand', weapon2:'Off hand', head:'Helmet', chest:'Body armour', hands:'Gloves', waist:'Belt', feet:'Boots', ring1:'Ring', ring2:'Ring', amulet:'Amulet', relic:'Relic', idol_altar:'Idol altar'};
+  const KIND = {u:'Unique', l:'Legendary', s:'Set', e:'Exalted', r:'Rare'};
+  const COLOR = {u:'var(--r-unique)', l:'var(--r-legendary)', s:'var(--r-set)', e:'var(--r-exalted)', r:'var(--r-rare)', k:'var(--text)'};
+  const RANK = {k:0, s:1, u:2, l:2, e:3, r:4};
+  const isUniq = k => k === 'u' || k === 'l' || k === 's';
+
+  const state = {filters:[], q:'', bases:false, open:{}, faction:'all', sort:'r', expanded:new Set(), limit:PAGE};
+  state.names = false;
+  try { const p = JSON.parse(localStorage.getItem('leninja-prefs') || '{}'); state.bases = !!p.bases; state.names = !!p.names; } catch(e) {}
+  const savePrefs = () => { try { localStorage.setItem('leninja-prefs', JSON.stringify({bases:state.bases, names:state.names})); } catch(e) {} };
+
+  const has = (r, f) => f.slot === 'skills' ? r.spn.includes(f.name) : f.slot === 'hotbar' ? !!r.hb && r.hb.includes(f.name) : (!r.ng && SLOT[f.slot].get(r).some(x => x[1] === f.name));
+  const matchesItems = r => state.filters.every(f => has(r, f));
+  const matches = r => (state.faction === 'all' || r.f === state.faction) && matchesItems(r);
+
+  const el = (t, a = {}, ...kids) => {
+    const n = document.createElement(t);
+    for (const k in a) {
+      if (a[k] == null) continue;
+      if (k === 'class') n.className = a[k];
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), a[k]);
+      else if (k === 'style') n.style.cssText = a[k];
+      else n.setAttribute(k, a[k]);
+    }
+    kids.flat().forEach(c => c != null && c !== false && n.append(c));
+    return n;
+  };
+  const chev = () => { const s = document.createElementNS(svgNS, 'svg'); s.setAttribute('width', 12); s.setAttribute('height', 12); const u = document.createElementNS(svgNS, 'use'); u.setAttribute('href', '#i-chev'); s.append(u); return s; };
+
+  // An item tile: icon if we have one, else the item's initial
+  function tile(item, opts = {}){
+    const [kind, name, cor] = item;
+    const tag = opts.onclick ? 'button' : 'span';
+    const src = ICONS[name];
+    return el(tag, {class:'ic' + (cor ? ' cor' : '') + (kind === 'l' ? ' leg' : '') + (opts.cls ? ' ' + opts.cls : ''), style:`--c:${COLOR[kind]}` + (opts.size ? `;--s:${opts.size}px` : ''),
+      title:opts.title || `${name} · ${KIND[kind]}${cor ? ' · corrupted' : ''}`, onclick:opts.onclick, type:opts.onclick ? 'button' : null, 'data-slot':opts.slot},
+      src ? el('img', {src, alt:name, loading:'lazy'}) : el('span', {class:'nog'}, name[0]));
+  }
+
+  // A skill icon. kind: both (hotbar + specialised), bar (hotbar only), spec (specialised, off bar), lad (ladder list only)
+  const SKTITLE = {both:'On hotbar, specialised', spec:'Specialised, not on hotbar', bar:'On hotbar, not specialised', lad:'Specialised (ladder data)'};
+  function sicon(name, kind, level, opts = {}){
+    const src = SKICONS[name];
+    return el(opts.onclick ? 'button' : 'span', {class:`sic ${kind || ''}` + (HL.has(name) ? ' hl' : ''), type:opts.onclick ? 'button' : null, style:opts.size ? `--s:${opts.size}px` : null,
+      title:opts.title || `${name}${level ? ' · level ' + level : ''}${kind ? ' · ' + SKTITLE[kind] : ''}`, onclick:opts.onclick},
+      src ? el('img', {src, alt:name, loading:'lazy'}) : el('span', {class:'nog'}, name[0]), level && !opts.noLevel ? el('b', {}, level) : null);
+  }
+
+  function toggle(slot, name, ev){
+    if (ev) ev.stopPropagation();
+    const i = state.filters.findIndex(f => f.slot === slot && f.name === name);
+    if (i >= 0) state.filters.splice(i, 1); else state.filters.push({slot, name});
+    render();
+  }
+
+  function renderSummary(shown){
+    const gear = shown.filter(r => !r.ng);
+    document.getElementById('s-n').textContent = shown.length;
+    document.getElementById('s-g').textContent = gear.length + ' with gear data';
+    const cs = shown.map(r => r.s).sort((a, b) => a - b);
+    document.getElementById('s-max').textContent = cs.length ? cs[cs.length - 1] : '–';
+    document.getElementById('s-med').textContent = cs.length ? (cs.length % 2 ? cs[(cs.length - 1) / 2] : Math.round((cs[cs.length / 2 - 1] + cs[cs.length / 2]) / 2)) : '–';
+
+    const mg = shown.filter(r => r.f === 'mg').length, cof = shown.filter(r => r.f === 'cof').length, known = mg + cof;
+    const split = document.getElementById('s-split'); split.replaceChildren();
+    if (known) {
+      if (mg) split.append(el('i', {style:`width:${mg / known * 100}%;background:var(--f-mg)`}, Math.round(mg / known * 100) + '%'));
+      if (cof) split.append(el('i', {style:`width:${cof / known * 100}%;background:var(--f-cof)`}, Math.round(cof / known * 100) + '%'));
+    }
+    document.getElementById('s-split-l').replaceChildren(
+      el('span', {style:'color:var(--f-mg)'}, `Merchant's Guild ${mg}`),
+      el('span', {style:'color:var(--f-cof)'}, `Circle of Fortune ${cof}`));
+
+    const NB = 18, lo = Math.floor(MINC / 10) * 10, step = Math.max(1, Math.ceil((MAXC + 1 - lo) / NB)), bins = Array(NB).fill(0);
+    shown.forEach(r => { bins[Math.min(NB - 1, Math.max(0, Math.floor((r.s - lo) / step)))]++; });
+    const mx = Math.max(1, ...bins), w = 300 / NB, svg = document.getElementById('s-hist');
+    svg.replaceChildren();
+    bins.forEach((b, i) => {
+      const h = b ? Math.max(3, b / mx * 42) : 1;
+      const rect = document.createElementNS(svgNS, 'rect');
+      rect.setAttribute('x', i * w + 2); rect.setAttribute('width', w - 4);
+      rect.setAttribute('y', 46 - h); rect.setAttribute('height', h); rect.setAttribute('rx', 1);
+      rect.setAttribute('fill', b ? 'var(--rift)' : 'var(--line)'); rect.setAttribute('opacity', b ? .35 + .65 * b / mx : 1);
+      const t = document.createElementNS(svgNS, 'title'); t.textContent = `${lo + i * step}–${lo + (i + 1) * step - 1}: ${b}`; rect.append(t);
+      svg.append(rect);
+    });
+    [[0, lo], [300, lo + NB * step]].forEach(([x, s]) => {
+      const t = document.createElementNS(svgNS, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', 56); t.setAttribute('fill', 'var(--faint)'); t.setAttribute('font-size', 8);
+      t.setAttribute('text-anchor', x ? 'end' : 'start'); t.setAttribute('font-family', 'Barlow Semi Condensed, sans-serif');
+      t.textContent = s; svg.append(t);
+    });
+  }
+
+  function renderActive(){
+    const act = document.getElementById('active'); act.replaceChildren();
+    if (!state.filters.length && state.faction === 'all') { act.append(el('span', {class:'lbl'}, 'Click any item, icon or skill to filter')); return; }
+    act.append(el('span', {class:'lbl'}, 'Filtering'));
+    if (state.faction !== 'all') act.append(el('button', {class:'pill', style:`color:var(--f-${state.faction});padding-left:8px`, onclick:() => { state.faction = 'all'; render(); }}, FNAME[state.faction], el('small', {}, '×')));
+    state.filters.forEach(f => { const sk = SLOT[f.slot].skill; act.append(el('button', {class:'pill', onclick:() => toggle(f.slot, f.name)}, sk ? sicon(f.name, 'both', null, {size:22}) : tile(['u', f.name, 0], {size:22}), f.name, el('small', {}, (f.slot === 'hotbar' ? 'on hotbar ' : f.slot === 'skills' ? 'specialised ' : '') + '×'))); });
+    act.append(el('button', {class:'clear', onclick:() => { state.filters = []; state.faction = 'all'; render(); }}, 'Clear all'));
+  }
+
+  function renderSlots(shown){
+    const pool = shown.filter(r => !r.ng);
+    const q = state.q.toLowerCase();
+    const wrap = document.getElementById('slots'); wrap.replaceChildren();
+    for (const s of SLOTS) {
+      const base = s.all ? shown : s.id === 'hotbar' ? shown.filter(r => r.hb) : pool;
+      const agg = new Map();
+      for (const r of base) {
+        const seen = new Set();
+        for (const [k, n] of s.get(r)) {
+          if (!agg.has(n)) agg.set(n, {name:n, kind:k, count:0, lp:0});
+          const a = agg.get(n);
+          if (RANK[k] < RANK[a.kind]) a.kind = k;
+          if (!seen.has(n)) { a.count++; if (k === 'l') a.lp++; seen.add(n); }
+        }
+      }
+      let list = [...agg.values()];
+      const isOn = a => state.filters.some(f => f.slot === s.id && f.name === a.name);
+      if (!state.bases && !s.skill) list = list.filter(a => isUniq(a.kind) || isOn(a));
+      if (q) list = list.filter(a => a.name.toLowerCase().includes(q));
+      if (!list.length && (q || s.id === 'idol_altar')) continue;
+      list.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+      const total = base.length || 1, lim = (state.open[s.id] || q) ? list.length : 5;
+      const sec = el('section', {class:'sec'}, el('h3', {}, s.label, el('span', {}, list.length + (list.length === 1 ? ' item' : ' items'))));
+      if (!list.length) sec.append(el('div', {class:'empty-opt'}, 'No uniques here. Include bases to see rares.'));
+      list.slice(0, lim).forEach(a => {
+        const on = isOn(a), pct = Math.round(a.count / total * 100);
+        const lp = a.lp ? el('small', {}, a.lp === a.count ? 'LP' : a.lp + ' LP') : null;
+        const title = `${a.count} of ${total} characters${a.lp ? ' · ' + a.lp + ' legendary' : ''}`;
+        if (s.skill) {
+          sec.append(el('button', {class:'opt' + (on ? ' on' : ''), style:`--w:${pct}%;--c:${HL.has(a.name) ? 'var(--frost)' : 'var(--text)'}`, 'aria-pressed':on, onclick:() => toggle(s.id, a.name), title},
+            sicon(a.name, s.id === 'hotbar' ? 'both' : 'both', null, {size:28, title}), el('span', {class:'nm'}, a.name), el('span', {class:'pc'}, pct + '%'), el('span', {class:'br'}, el('i'))));
+        } else {
+          sec.append(el('button', {class:'opt' + (on ? ' on' : ''), style:`--w:${pct}%;--c:${COLOR[a.kind]}`, 'aria-pressed':on, onclick:() => toggle(s.id, a.name), title},
+            tile([a.kind, a.name, 0], {title}), el('span', {class:'nm'}, a.name, lp), el('span', {class:'pc'}, pct + '%'), el('span', {class:'br'}, el('i'))));
+        }
+      });
+      if (list.length > lim) sec.append(el('button', {class:'more', onclick:() => { state.open[s.id] = true; render(); }}, `Show ${list.length - lim} more`));
+      wrap.append(sec);
+    }
+  }
+
+  function detail(r){
+    const doll = el('div', {class:'doll'}, ['head','amulet','weapon1','chest','weapon2','ring1','waist','ring2','hands','feet','relic'].map(k => {
+      const x = r.e[k];
+      return x ? tile(x, {slot:k, cls:'slot', title:`${SLOT_LABEL[k]}: ${x[1]} · ${KIND[x[0]]}${x[2] ? ' · corrupted' : ''}`, onclick:e => toggle(SLOT_OF(k), x[1], e)}) : el('span', {class:'slot empty', 'data-slot':k, style:`grid-area:${k}`});
+    }));
+    doll.querySelectorAll('[data-slot]').forEach(n => n.style.gridArea = n.dataset.slot);
+    const items = el('div', {}, el('h4', {class:'panel-h'}, 'Equipment'),
+      el('ul', {class:'list'}, [...EQUIP, 'idol_altar'].filter(k => r.e[k]).map(k => {
+        const x = r.e[k];
+        return el('li', {style:`--c:${COLOR[x[0]]}`}, tile(x), el('span', {class:'t'}, el('b', {}, x[1]), el('small', {}, `${SLOT_LABEL[k]} · ${KIND[x[0]]}${x[2] ? ' · corrupted' : ''}`)));
+      })));
+    const idols = el('div', {class:'idols'}, el('h4', {class:'panel-h'}, `Idols (${(r.i || []).length})`),
+      el('div', {class:'idol-grid'}, [...(r.i || [])].sort((a, b) => RANK[a[0]] - RANK[b[0]]).map(x => tile(x, {onclick:e => toggle('idols', x[1], e)}))),
+      el('a', {class:'ext', href:'https://www.lastepochtools.com' + r.h, target:'_blank', rel:'noopener', onclick:e => e.stopPropagation()}, 'Full profile on lastepochtools ↗'));
+    return el('tr', {class:'detail'}, el('td', {colspan:6}, el('div', {class:'doll-wrap'}, doll, items, idols)));
+  }
+
+  // Hotbar skills first, in bar order; then specialised skills that are not on the bar
+  function skillCell(r){
+    const lvl = new Map((r.sp || []).map(([n, l]) => [n, l]));
+    const spec = new Set(r.spn), bar = r.hb || [];
+    const one = (n, kind) => {
+      const click = e => toggle(kind === 'bar' ? 'hotbar' : 'skills', n, e);
+      if (!state.names) return sicon(n, kind, lvl.get(n), {onclick:click});
+      return el('button', {class:`namechip ${kind}`, type:'button', title:SKTITLE[kind] + ' · click to filter', style:HL.has(n) ? '--c:var(--frost)' : null, onclick:click},
+        sicon(n, kind, null), n, lvl.has(n) ? el('span', {class:'lv'}, lvl.get(n)) : null);
+    };
+    if (!r.hb) return el('div', {class:'skill-strip'}, r.spn.map(n => one(n, 'lad')));
+    const off = r.spn.filter(n => !bar.includes(n));
+    return el('div', {class:'skill-strip'}, el('span', {class:'tray', title:'Hotbar'}, bar.map(n => one(n, spec.has(n) ? 'both' : 'bar'))), off.map(n => one(n, 'spec')));
+  }
+
+  function renderRows(shown){
+    const tb = document.getElementById('rows'); tb.replaceChildren();
+    const list = [...shown].sort(state.sort === 'l' ? (a, b) => b.l - a.l || a.r - b.r : (a, b) => a.r - b.r);
+    if (!list.length) { tb.append(el('tr', {}, el('td', {colspan:6, class:'empty'}, 'No characters match every filter. Remove one to widen the search.'))); return; }
+    for (const r of list.slice(0, state.limit)) {
+      const open = state.expanded.has(r.h);
+      let gear;
+      if (r.ng) gear = el('span', {class:'nogear'}, 'Not imported by lastepochtools yet');
+      else {
+        // Items already pinned by a filter are identical on every row, so leave them out and give the rest more room
+        const all = EQUIP.filter(k => r.e[k]);
+        const known = k => state.filters.some(f => f.slot === SLOT_OF(k) && f.name === r.e[k][1]);
+        const eq = all.filter(k => !known(k)), hidden = all.length - eq.length;
+        const size = !hidden ? 34 : eq.length <= 6 ? 50 : eq.length <= 9 ? 42 : 38;
+        const tip = k => `${SLOT_LABEL[k]}: ${r.e[k][1]} · ${KIND[r.e[k][0]]}${r.e[k][2] ? ' · corrupted' : ''}`;
+        gear = all.length ? el('div', {class:'strip-ic'},
+          eq.map(k => state.names
+            ? el('button', {class:'namechip', type:'button', style:`--c:${COLOR[r.e[k][0]]}`, title:tip(k), onclick:e => toggle(SLOT_OF(k), r.e[k][1], e)}, tile(r.e[k]), r.e[k][1])
+            : tile(r.e[k], {size, title:tip(k), onclick:e => toggle(SLOT_OF(k), r.e[k][1], e)})),
+          hidden ? el('span', {class:'hid', title:'Items matching your filters are hidden here'}, `+${hidden} filtered`) : null)
+          : el('span', {class:'nogear'}, 'No equipment recorded');
+      }
+      const tr = el('tr', {class:'row' + (r.ng ? ' dim' : '') + (open ? ' open' : ''), tabindex:r.ng ? -1 : 0, 'aria-expanded':r.ng ? null : String(open),
+        onclick:() => { if (r.ng) return; open ? state.expanded.delete(r.h) : state.expanded.add(r.h); renderRows(shown); },
+        onkeydown:e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) { e.preventDefault(); e.currentTarget.click(); } }},
+        el('td', {class:'n rank'}, '#' + r.r),
+        el('td', {class:'who'}, el('div', {class:'c'}, r.ng ? el('span', {style:'width:12px'}) : chev(), r.c), el('div', {class:'a'}, r.a, r.f ? el('span', {class:'fac ' + r.f, title:`${FNAME[r.f]}, rank ${r.fr}`}, `${FSHORT[r.f]} ${r.fr}`) : null)),
+        el('td', {class:'n'}, r.l),
+        el('td', {}, el('div', {class:'corr'}, el('b', {}, r.s), el('i', {style:`--w:${Math.round(r.s / MAXC * 100)}%`}))),
+        el('td', {}, skillCell(r)),
+        el('td', {}, gear));
+      tb.append(tr);
+      if (open && !r.ng) tb.append(detail(r));
+    }
+    if (list.length > state.limit) {
+      const rest = list.length - state.limit;
+      tb.append(el('tr', {}, el('td', {colspan:6, style:'padding:0'}, el('button', {class:'more', style:'padding:10px', onclick:() => { state.limit += PAGE; renderRows(shown); }}, `Show ${Math.min(PAGE, rest)} more of ${rest}`))));
+    }
+  }
+
+  function render(){
+    state.limit = PAGE;
+    const shown = ROWS.filter(matches);
+    const base = ROWS.filter(matchesItems);
+    document.getElementById('c-all').textContent = base.length;
+    document.getElementById('c-mg').textContent = base.filter(r => r.f === 'mg').length;
+    document.getElementById('c-cof').textContent = base.filter(r => r.f === 'cof').length;
+    document.querySelectorAll('#seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === state.faction));
+    document.querySelectorAll('#sort button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === state.sort));
+    renderSummary(shown); renderActive(); renderSlots(shown); renderRows(shown);
+  }
+
+  document.querySelectorAll('#seg button').forEach(b => b.addEventListener('click', () => { state.faction = b.dataset.f; render(); }));
+  document.querySelectorAll('#sort button').forEach(b => b.addEventListener('click', () => { state.sort = b.dataset.s; render(); }));
+  // Skill legend, drawn with the real Surge icon
+  const legendSkill = SKICONS['Surge'] ? 'Surge' : (META.skills[0] || Object.keys(SKICONS)[0] || 'Skill');
+  document.getElementById('sk-legend').append(
+    el('span', {}, sicon(legendSkill, 'both', 20, {title:'Example'}), 'On hotbar · spec level'),
+    el('span', {}, sicon(legendSkill, 'bar', null, {title:'Example'}), 'Hotbar, unspecialised'),
+    el('span', {}, sicon(legendSkill, 'spec', 20, {title:'Example'}), 'Specialised, off bar'));
+  const nm = document.getElementById('names'); nm.checked = state.names;
+  const applyNames = () => document.querySelector('main').classList.toggle('names', state.names);
+  applyNames();
+  nm.addEventListener('change', e => { state.names = e.target.checked; savePrefs(); applyNames(); renderRows(ROWS.filter(matches)); });
+  document.getElementById('q').addEventListener('input', e => { state.q = e.target.value; render(); });
+  const cb = document.getElementById('bases'); cb.checked = state.bases;
+  cb.addEventListener('change', e => { state.bases = e.target.checked; savePrefs(); render(); });
+  // Open the top character so the paperdoll is visible on first load
+  const firstGear = ROWS.slice().sort((a, b) => a.r - b.r).find(r => !r.ng);
+  if (firstGear) state.expanded.add(firstGear.h);
+  render();
+})();
+</script>

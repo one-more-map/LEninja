@@ -1,0 +1,12 @@
+{
+  "name": "leninja",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "node scrape.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.63.0",
+    "sharp": "^0.35.5"
+  }
+}
