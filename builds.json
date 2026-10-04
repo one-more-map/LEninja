@@ -1,5 +1,5 @@
 [
-  { "data": "data/rage-of-the-frostborn_spellblade_surge_firebrand.json", "out": "leninja.html" },
-  { "data": "data/rage-of-the-frostborn_void-knight_shield-throw.json", "out": "void-knight-shield-throw.html" },
-  { "data": "data/rage-of-the-frostborn_bladedancer_dreamslash-shift-shadow-cascade.json", "out": "bladedancer-dreamslash-shift-shadow-cascade.html" }
+  { "slug": "spellblade-surge-firebrand", "out": "leninja.html" },
+  { "slug": "void-knight-shield-throw", "out": "void-knight-shield-throw.html" },
+  { "slug": "bladedancer-dreamslash-shift-shadow-cascade", "out": "bladedancer-dreamslash-shift-shadow-cascade.html" }
 ]

@@ -28,6 +28,8 @@ if (packed) {
   console.log('Unpacked to', unpacked);
 }
 
+// Snapshot switcher entries ([{label, date, total, href, on}]), passed in by build-all.mjs
+if (process.env.LENINJA_SNAPSHOTS) meta = { ...meta, snapshots: JSON.parse(process.env.LENINJA_SNAPSHOTS) };
 const safe = s => JSON.stringify(s).replace(/</g, '\\u003c');
 // Item icons (from icons.mjs), trimmed to the items this data set uses
 let iconTag = '';

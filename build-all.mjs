@@ -1,15 +1,32 @@
-// Builds every page listed in builds.json, then index.html (a card per build).
+// Builds every build listed in builds.json, then index.html (a card per build).
+// Each build keeps its scrapes in data/snapshots/<slug>/*.json. Every snapshot gets its own page
+// (<out>-dayN.html, oldest = Day 1) and the build's main page (<out>) always shows the newest one.
 //   node build-all.mjs
 import fs from 'node:fs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-const builds = JSON.parse(fs.readFileSync('builds.json', 'utf8')).filter(b => fs.existsSync(b.data));
+const builds = JSON.parse(fs.readFileSync('builds.json', 'utf8')).map(b => {
+  const dir = path.join('data', 'snapshots', b.slug);
+  const snaps = (fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.json')) : [])
+    .map(f => { const file = path.join(dir, f); const { meta } = JSON.parse(fs.readFileSync(file, 'utf8')); return { file, date: meta.scrapedAt, total: meta.total }; })
+    .sort((x, y) => new Date(x.date) - new Date(y.date));
+  return { ...b, snaps };
+}).filter(b => b.snaps.length);
 const skillIcons = fs.existsSync('data/skill-icons.json') ? JSON.parse(fs.readFileSync('data/skill-icons.json', 'utf8')) : {};
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])).replace(/[^\x00-\x7f]/g, c => '&#x' + c.codePointAt(0).toString(16) + ';');
 
 const cards = builds.map(b => {
-  execFileSync(process.execPath, ['build.mjs', b.data, b.out], { stdio: 'inherit' });
-  const { meta, rows } = JSON.parse(fs.readFileSync(b.data, 'utf8'));
+  const base = b.out.replace(/\.html$/, ''), last = b.snaps.length - 1;
+  const pageOf = i => `${base}-day${i + 1}.html`;
+  const list = cur => b.snaps.map((s, i) => ({ label: `Day ${i + 1}`, date: s.date, total: s.total, href: i === last ? b.out : pageOf(i), on: i === cur }));
+  b.snaps.forEach((s, i) => {
+    const env = { ...process.env, LENINJA_SNAPSHOTS: JSON.stringify(list(i)) };
+    execFileSync(process.execPath, ['build.mjs', s.file, i === last ? b.out : pageOf(i)], { stdio: 'inherit', env });
+  });
+  // the newest snapshot also gets a permanent dayN page, so links to a given day keep working
+  fs.copyFileSync(b.out, pageOf(last));
+  const { meta, rows } = JSON.parse(fs.readFileSync(b.snaps[last].file, 'utf8'));
   const gear = rows.filter(r => !r.ng);
   const top = Math.max(...rows.map(r => r.s));
   const sorted = rows.map(r => r.s).sort((x, y) => x - y), med = sorted[Math.floor(sorted.length / 2)];
@@ -25,11 +42,11 @@ const cards = builds.map(b => {
     <div class="skills">${skills}</div>
     <dl><div><dt>Characters</dt><dd>${rows.length}</dd></div><div><dt>Top corruption</dt><dd>${top}</dd></div><div><dt>Median</dt><dd>${med}</dd></div></dl>
     <ul class="uniq">${uniq}</ul>
-    <div class="foot">${gear.length} with gear &middot; scraped ${date}</div>
+    <div class="foot">${gear.length} with gear &middot; scraped ${date}${b.snaps.length > 1 ? ` &middot; ${b.snaps.length} snapshots` : ''}</div>
   </a>`;
 }).join('\n');
 
-const season = (JSON.parse(fs.readFileSync(builds[0].data, 'utf8')).meta.season || '').split(' / ')[0];
+const season = (JSON.parse(fs.readFileSync(builds[0].snaps[0].file, 'utf8')).meta.season || '').split(' / ')[0];
 const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LE Ninja</title>

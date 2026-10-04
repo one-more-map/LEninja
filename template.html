@@ -104,6 +104,13 @@ button.ic:hover{border-color:var(--c);transform:translateY(-1px)}
 /* Filter rail */
 aside{min-width:0}
 .rail{padding:10px}
+.snaps{position:relative;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px;margin-top:16px}
+.snaps .lbl{font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-right:4px}
+.snaps a{display:flex;flex-direction:column;align-items:center;min-width:64px;padding:4px 10px;border:1px solid var(--line);border-radius:2px;background:rgba(14,19,28,.7);text-decoration:none;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--dim);line-height:1.2}
+.snaps a small{font-size:11px;font-weight:500;color:var(--faint)}
+.snaps a:hover{border-color:var(--gold-dim);color:var(--text)}
+.snaps a[aria-current="page"]{color:var(--frost);border-color:var(--rift);background:rgba(98,214,234,.08)}
+.snaps a:focus-visible{outline:2px solid var(--rift);outline-offset:2px}
 .seg{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
 .seg button{border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:3px 8px;cursor:pointer;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--dim)}
 .seg button small{font-weight:500;color:var(--faint);margin-left:3px}
@@ -374,6 +381,7 @@ footer h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spaci
   <div class="eyebrow" id="eyebrow">Last Epoch ladder</div>
   <h1 id="h1"><span class="who">Builds</span></h1>
   <div class="tags" id="tags"></div>
+  <nav class="snaps" id="snaps" aria-label="Snapshot" hidden></nav>
 </header>
 
 <div class="wrap">
@@ -499,9 +507,23 @@ catch(_){prompt('LE Ninja: copy this text and paste it into LE Ninja',txt)}
     const a = document.createElement('span'); a.className = 'who'; a.textContent = who; h1.append(a);
     const b = document.createElement('span'); b.className = 'what'; b.textContent = META.skills.length ? META.skills.join(' · ') : 'All builds'; h1.append(b);
     const tags = document.getElementById('tags');
-    [META.baseClass, `Top ${META.total} characters`, `${META.pages} ladder page${META.pages === 1 ? '' : 's'}`].forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); });
+    const pages = Math.ceil(META.total / 50);
+    [META.baseClass, `Top ${META.total} characters`, `${pages} ladder page${pages === 1 ? '' : 's'}`].forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); });
     const d = new Date(META.scrapedAt);
     document.getElementById('snap').textContent = 'Data scraped ' + d.toLocaleString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    // Snapshot switcher: each scrape is its own page, newest is the build's main page
+    if ((META.snapshots || []).length > 1) {
+      const nav = document.getElementById('snaps');
+      const lbl = document.createElement('span'); lbl.className = 'lbl'; lbl.textContent = 'Snapshot'; nav.append(lbl);
+      META.snapshots.forEach(s => {
+        const a = document.createElement('a'); a.href = s.href; a.textContent = s.label;
+        if (s.on) a.setAttribute('aria-current', 'page');
+        const sm = document.createElement('small'); sm.textContent = `${new Date(s.date).toLocaleDateString(undefined, {day:'numeric', month:'short'})} · ${s.total}`; a.append(sm);
+        a.title = `Scraped ${new Date(s.date).toLocaleString()} · top ${s.total} characters`;
+        nav.append(a);
+      });
+      nav.hidden = false;
+    }
     const ng = ROWS.filter(r => r.ng).length;
     document.getElementById('ng-note').textContent = ng ? `${ng} of these ${ROWS.length} characters have never been imported by lastepochtools, so they have no gear or faction and drop out when you filter by an item or a faction.` : '';
     const ticks = document.getElementById('ticks');
