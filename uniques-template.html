@@ -1,0 +1,275 @@
+<title>LE Ninja Uniques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Same frost-and-gold look as the build pages: dark-only, gold-framed groups, item rows with usage bars and LP odds. */
+:root{
+  color-scheme:dark;
+  --void:#070a10; --panel:#0e131c; --panel-2:#131a26; --raised:#182131; --line:#212b3b;
+  --gold:#c9a45c; --gold-dim:#5e4c2c; --gold-hi:#efd59a; --rift:#62d6ea; --rift-dim:#1c4a56; --frost:#a9e6f2;
+  --text:#e2e7ef; --dim:#8a95a8; --faint:#5b6577;
+  --r-unique:#f0913a; --r-set:#57d36d; --r-legendary:#ff5a43; --lp:#f27ad6; --ww:#d6a2ff;
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --ui:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,sans-serif;
+  --corners:
+    linear-gradient(var(--gold),var(--gold)) top left/14px 1px,linear-gradient(var(--gold),var(--gold)) top left/1px 14px,
+    linear-gradient(var(--gold),var(--gold)) top right/14px 1px,linear-gradient(var(--gold),var(--gold)) top right/1px 14px,
+    linear-gradient(var(--gold),var(--gold)) bottom left/14px 1px,linear-gradient(var(--gold),var(--gold)) bottom left/1px 14px,
+    linear-gradient(var(--gold),var(--gold)) bottom right/14px 1px,linear-gradient(var(--gold),var(--gold)) bottom right/1px 14px;
+}
+*{box-sizing:border-box}
+html{background:var(--void)}
+body{background:var(--void);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.4}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--rift);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(7,10,16,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--gold-dim)}
+.bar-in{max-width:1400px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;gap:16px}
+.brand{text-decoration:none;display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;letter-spacing:.06em;font-size:17px;color:var(--gold-hi)}
+.nav{display:flex;height:100%;margin:0 auto;font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.08em}
+.nav span,.nav a{display:flex;align-items:center;padding:0 18px;color:var(--dim);text-decoration:none}
+.nav .on{color:var(--frost);background:linear-gradient(180deg,transparent,rgba(98,214,234,.12));box-shadow:inset 0 -2px 0 var(--rift)}
+.bar .note{font-family:var(--ui);font-size:13px;color:var(--faint);white-space:nowrap}
+@media (max-width:760px){.bar .note,.nav span:not(.on){display:none}.nav{margin:0 0 0 auto;font-size:12px}.nav a{padding:0 8px}.bar-in{gap:8px}.brand{font-size:14px;gap:6px;white-space:nowrap}.brand svg{width:20px;height:20px}}
+
+.hero{text-align:center;padding:28px 16px 26px;border-bottom:1px solid var(--line);
+  background:radial-gradient(600px 220px at 50% 70%,rgba(98,214,234,.14),transparent 70%),radial-gradient(900px 300px at 50% 0,rgba(201,164,92,.08),transparent 70%)}
+.eyebrow{font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+h1{margin:6px 0 0;font-family:var(--display);font-weight:600;font-size:clamp(34px,6vw,56px);letter-spacing:.06em;text-transform:uppercase;line-height:1;
+  background:linear-gradient(180deg,#f6e7c2,#c9a45c 70%,#8d6f37);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{max-width:62ch;margin:12px auto 0;color:var(--dim);font-size:15px;text-wrap:balance}
+
+.wrap{max-width:1400px;margin:0 auto;padding:18px 16px 120px}
+.frame{position:relative;background:var(--corners),linear-gradient(180deg,var(--panel-2),var(--panel));background-repeat:no-repeat;border:1px solid var(--gold-dim);border-radius:3px}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:12px 14px;margin-bottom:16px}
+.search{flex:1 1 220px;min-width:0;background:var(--void);border:1px solid var(--line);border-radius:2px;padding:7px 10px}
+.search::placeholder{color:var(--faint)}
+.lbl{font-family:var(--ui);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:3px 9px;cursor:pointer;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--dim)}
+.seg button[aria-pressed="true"]{color:var(--frost);border-color:var(--rift);background:rgba(98,214,234,.08)}
+.chk{display:flex;align-items:center;gap:6px;font-family:var(--ui);font-size:14px;color:var(--dim);cursor:pointer}
+select{background:var(--void);border:1px solid var(--line);border-radius:2px;padding:5px 8px;font-family:var(--ui)}
+.jump{display:flex;flex-wrap:wrap;gap:4px 10px;margin:-6px 0 16px;font-family:var(--ui);font-size:13px}
+.jump a{color:var(--dim);text-decoration:none}.jump a:hover{color:var(--frost)}
+.jump small{color:var(--faint)}
+
+/* Groups */
+.group{margin-bottom:18px}
+.ghead{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.ghead h2{margin:0;font-family:var(--display);font-size:18px;font-weight:600;letter-spacing:.06em;color:var(--gold-hi)}
+.ghead .cnt{font-family:var(--ui);color:var(--faint);font-size:13px}
+.ghead .gbtn{margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:2px 9px;cursor:pointer;font-family:var(--ui);font-size:13px;color:var(--dim)}
+.ghead .gbtn:hover{color:var(--frost);border-color:var(--rift-dim)}
+.rows{display:grid}
+.row{display:grid;grid-template-columns:22px 48px minmax(180px,1.3fr) minmax(200px,1.4fr) minmax(220px,1.2fr);gap:12px;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(33,43,59,.6)}
+.row:last-child{border-bottom:0}
+.row.sel{background:rgba(98,214,234,.06)}
+.row input{width:16px;height:16px;accent-color:var(--rift);cursor:pointer}
+.ico{width:48px;height:48px;border-radius:3px;background:radial-gradient(circle at 50% 40%,#1b2433,#0b0f17);border:1px solid var(--line);display:grid;place-items:center}
+.ico img{width:44px;height:44px}
+.nm{min-width:0}
+.nm b{display:block;font-family:var(--ui);font-size:16px;font-weight:600;color:var(--r-unique);overflow-wrap:anywhere}
+.nm b.set{color:var(--r-set)} .nm b.ww{color:var(--ww)}
+.nm .base{font-family:var(--ui);font-size:13px;color:var(--dim)}
+.badge{display:inline-block;margin-left:6px;padding:0 5px;border:1px solid var(--line);border-radius:2px;font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);vertical-align:1px}
+.badge.boss{color:var(--gold);border-color:var(--gold-dim)}
+.use{display:grid;gap:4px;min-width:0}
+.ub{display:grid;grid-template-columns:minmax(70px,auto) 1fr 40px;gap:8px;align-items:center;font-family:var(--ui);font-size:13px}
+.ub .bn{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ub .tr{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.ub .tr i{display:block;height:100%;background:linear-gradient(90deg,var(--rift-dim),var(--rift))}
+.ub .pc{text-align:right;color:var(--frost);font-variant-numeric:tabular-nums}
+.ub.seen{grid-template-columns:auto 1fr}
+.ub.seen .bn{color:var(--faint)}
+.lps{color:var(--lp)}
+.none{font-family:var(--ui);font-size:13px;color:var(--faint)}
+.lp{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.lp div{text-align:center;padding:3px 0;border:1px solid var(--line);border-radius:2px;background:rgba(242,122,214,.04)}
+.lp div b{display:block;font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--lp)}
+.lp div span{font-family:var(--ui);font-size:13px;font-variant-numeric:tabular-nums}
+.nolp{font-family:var(--ui);font-size:13px;color:var(--faint)}
+@media (max-width:900px){
+  .row{grid-template-columns:22px 48px 1fr;grid-template-areas:"c i n" ". u u" ". l l"}
+  .row input{grid-area:c}.row .ico{grid-area:i}.row .nm{grid-area:n}.row .use{grid-area:u}.row .lpw{grid-area:l}
+}
+.empty{padding:30px;text-align:center;color:var(--faint)}
+
+/* Selection tray */
+.tray{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(7,10,16,.94);backdrop-filter:blur(8px);border-top:1px solid var(--gold-dim);transform:translateY(110%);transition:transform .2s}
+.tray.on{transform:none}
+.tray-in{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.tray .n{font-family:var(--display);font-weight:600;color:var(--gold-hi)}
+.tray .list{flex:1 1 300px;min-width:0;font-family:var(--ui);font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{border:1px solid var(--rift);background:rgba(98,214,234,.1);color:var(--frost);border-radius:2px;padding:6px 14px;cursor:pointer;font-family:var(--ui);font-weight:600}
+.btn.ghost{border-color:var(--line);background:transparent;color:var(--dim)}
+.toast{font-family:var(--ui);font-size:13px;color:var(--rift)}
+footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
+</style>
+
+<div class="bar"><div class="bar-in">
+  <a class="brand" href="index.html" title="All builds">
+    <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#c9a45c" stroke-width="1.2"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="#62d6ea" stroke-width=".8" stroke-dasharray="1.5 2.4"/><path d="M12 5.5V12l4 2.6" fill="none" stroke="#efd59a" stroke-width="1.6" stroke-linecap="round"/></svg>
+    LE NINJA
+  </a>
+  <nav class="nav" aria-label="Sections"><a href="index.html">BUILDS</a><a class="on" href="uniques.html">UNIQUES</a><span>LADDERS</span></nav>
+  <span class="note" id="note"></span>
+</div></div>
+
+<header class="hero">
+  <div class="eyebrow" id="eyebrow">Season 5 &middot; Rage of the Frostborn</div>
+  <h1>Uniques</h1>
+  <p class="lede">Every unique in the game, grouped by type, with its Legendary Potential odds and how many ladder players on each build wear it. Tick the ones you want and copy the names into your loot filter.</p>
+</header>
+
+<main class="wrap">
+  <div class="controls frame">
+    <input class="search" id="q" type="search" placeholder="Search uniques or base items" aria-label="Search uniques">
+    <span class="lbl">Build</span>
+    <div class="seg" id="builds" role="group" aria-label="Build"></div>
+    <label class="chk"><input type="checkbox" id="used"> Used by builds only</label>
+    <label class="chk"><input type="checkbox" id="random"> Random drops only</label>
+    <label class="chk"><span class="lbl">Sort</span>
+      <select id="sort"><option value="pop">Most used</option><option value="lp">Best LP odds</option><option value="lvl">Level</option><option value="name">Name</option></select></label>
+  </div>
+  <nav class="jump" id="jump" aria-label="Item types"></nav>
+  <div id="groups"></div>
+  <footer>LP odds are lastepochtools' drop odds at area level 100 (1 to 4 LP, all LP rolls counted). Usage counts characters with gear on the latest snapshot of each build. Data from lastepochtools.com &middot; item art &copy; Eleventh Hour Games</footer>
+</main>
+
+<div class="tray" id="tray" aria-live="polite"><div class="tray-in">
+  <span class="n" id="tn"></span>
+  <span class="list" id="tl"></span>
+  <span class="toast" id="toast"></span>
+  <button class="btn" id="copy">Copy names</button>
+  <button class="btn ghost" id="clear">Clear</button>
+</div></div>
+
+<!--DATA-->
+<script>
+(() => {
+  const J = id => JSON.parse(document.getElementById(id).textContent);
+  const META = J('meta'), UNIQ = J('uniques'), ICONS = J('icons');
+  const BUILDS = META.builds;
+  const TYPE_ORDER = ['Helmet','Body Armor','Gloves','Belt','Boots','Amulet','Ring','Relic',
+    'One-Handed Sword','One-Handed Axe','One-Handed Mace','Dagger','Sceptre','Wand',
+    'Two-Handed Sword','Two-Handed Axe','Two-Handed Mace','Two-Handed Spear','Two-Handed Staff','Bow',
+    'Shield','Off-Hand Catalyst','Quiver','Small Idol','Large Idol','Huge Idol','Grand Idol','Adorned Idol'];
+  const plural = t => /s$/.test(t) || /Armor$/.test(t) ? t : t + 's';
+  const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const pct = (x, d = 0) => x >= 0.995 ? '100%' : x < 0.0005 && x > 0 ? '<0.1%' : (x * 100).toFixed(x < 0.1 && d === 0 ? 1 : d) + '%';
+  const el = (t, a = {}, ...k) => { const e = document.createElement(t); for (const [n, v] of Object.entries(a)) { if (n === 'class') e.className = v; else if (n === 'text') e.textContent = v; else e.setAttribute(n, v); } e.append(...k.filter(x => x != null)); return e; };
+
+  document.getElementById('note').textContent = `${UNIQ.length} uniques`;
+  let store = {}; try { store = JSON.parse(localStorage.getItem('leninja-uniques') || '{}'); } catch (e) {}
+  const state = { q: '', build: store.build ?? -1, used: !!store.used, random: !!store.random, sort: store.sort || 'pop', sel: new Set(store.sel || []) };
+  const save = () => { try { localStorage.setItem('leninja-uniques', JSON.stringify({ build: state.build, used: state.used, random: state.random, sort: state.sort, sel: [...state.sel] })); } catch (e) {} };
+
+  // usage share for the active build filter (or best across builds)
+  const share = u => {
+    if (state.build >= 0) { const x = u.use[state.build]; return x ? x[0] / BUILDS[state.build].gear : 0; }
+    let m = 0; u.use.forEach((x, i) => { if (x) m = Math.max(m, x[0] / BUILDS[i].gear); }); return m;
+  };
+  const lp1 = u => Array.isArray(u.odds) ? 1 - u.odds[0] : -1;
+
+  // Build filter buttons
+  const bwrap = document.getElementById('builds');
+  [{ label: 'All', i: -1 }, ...BUILDS.map((b, i) => ({ label: b.label, i }))].forEach(({ label, i }) => {
+    const b = el('button', { type: 'button', text: label, 'aria-pressed': String(state.build === i) });
+    b.onclick = () => { state.build = i; [...bwrap.children].forEach(x => x.setAttribute('aria-pressed', String(x === b))); save(); render(); };
+    bwrap.append(b);
+  });
+  const q = document.getElementById('q'), used = document.getElementById('used'), random = document.getElementById('random'), sort = document.getElementById('sort');
+  used.checked = state.used; random.checked = state.random; sort.value = state.sort;
+  q.oninput = () => { state.q = q.value.trim().toLowerCase(); render(); };
+  used.onchange = () => { state.used = used.checked; save(); render(); };
+  random.onchange = () => { state.random = random.checked; save(); render(); };
+  sort.onchange = () => { state.sort = sort.value; save(); render(); };
+
+  function lpCell(u) {
+    if (!Array.isArray(u.odds)) {
+      const why = { set: 'Set item, no LP', ww: "Weaver's Will, no LP", idol: 'Idol, no LP', level: 'No LP drops' }[u.odds] || 'No LP';
+      return el('div', { class: 'nolp', text: why });
+    }
+    return el('div', { class: 'lp', title: `Chance to drop with exactly 0 LP: ${pct(u.odds[0], 1)}` },
+      ...[1, 2, 3, 4].map(k => el('div', {}, el('b', { text: k + ' LP' }), el('span', { text: pct(u.odds[k]) }))));
+  }
+  function useCell(u) {
+    const list = u.use.map((x, i) => x ? [i, x] : null).filter(Boolean).filter(([i]) => state.build < 0 || i === state.build)
+      .sort((a, b) => b[1][0] / BUILDS[b[0]].gear - a[1][0] / BUILDS[a[0]].gear);
+    if (!list.length) return el('div', { class: 'use' }, el('span', { class: 'none', text: state.build >= 0 ? 'Not used by this build' : 'Not used by the tracked builds' }));
+    const w = el('div', { class: 'use' });
+    list.forEach(([i, x]) => {
+      const s = x[0] / BUILDS[i].gear;
+      w.append(el('div', { class: 'ub', title: `${x[0]} of ${BUILDS[i].gear} ${BUILDS[i].label} players with gear` },
+        el('a', { class: 'bn', href: BUILDS[i].out, text: BUILDS[i].label }), el('span', { class: 'tr' }, el('i', { style: `width:${Math.max(2, s * 100)}%` })), el('span', { class: 'pc', text: pct(s) })));
+    });
+    // LP actually seen on players' copies (legendaries carry LP mods)
+    const seen = [0, 0, 0, 0, 0]; list.forEach(([, x]) => x[1].forEach((n, k) => seen[k] += n));
+    if (seen.slice(1).some(Boolean)) {
+      w.append(el('div', { class: 'ub seen' }, el('span', { class: 'bn', text: 'Seen on players' }),
+        el('span', { class: 'lps', text: seen.map((n, k) => n && k ? `${k} LP ×${n}` : null).filter(Boolean).join(' · ') })));
+    }
+    return w;
+  }
+  function row(u) {
+    const cb = el('input', { type: 'checkbox', 'aria-label': 'Select ' + u.name });
+    cb.checked = state.sel.has(u.name);
+    const r = el('div', { class: 'row' + (cb.checked ? ' sel' : '') },
+      cb,
+      el('div', { class: 'ico' }, ICONS[u.name] ? el('img', { src: ICONS[u.name], alt: '', loading: 'lazy' }) : null),
+      el('div', { class: 'nm' },
+        el('b', { class: u.set ? 'set' : u.ww ? 'ww' : '', text: u.name }),
+        el('span', { class: 'base', text: `${u.base || u.type} · lvl ${u.lvl}` }),
+        u.random ? null : el('span', { class: 'badge boss', text: 'Targeted drop', title: "Doesn't drop randomly: comes from a boss, dungeon or other specific source" })),
+      useCell(u),
+      el('div', { class: 'lpw' }, lpCell(u)));
+    cb.onchange = () => { cb.checked ? state.sel.add(u.name) : state.sel.delete(u.name); r.classList.toggle('sel', cb.checked); save(); tray(); };
+    return r;
+  }
+
+  const groupsEl = document.getElementById('groups'), jump = document.getElementById('jump');
+  function render() {
+    let list = UNIQ.filter(u => (!state.q || u.name.toLowerCase().includes(state.q) || (u.base || '').toLowerCase().includes(state.q) || u.type.toLowerCase().includes(state.q))
+      && (!state.used || share(u) > 0) && (!state.random || u.random));
+    const cmp = { pop: (a, b) => share(b) - share(a) || lp1(b) - lp1(a) || a.name.localeCompare(b.name),
+      lp: (a, b) => lp1(b) - lp1(a) || share(b) - share(a), lvl: (a, b) => b.lvl - a.lvl || a.name.localeCompare(b.name), name: (a, b) => a.name.localeCompare(b.name) }[state.sort];
+    const by = new Map(); list.forEach(u => { if (!by.has(u.type)) by.set(u.type, []); by.get(u.type).push(u); });
+    const types = [...by.keys()].sort((a, b) => (TYPE_ORDER.indexOf(a) + 1 || 99) - (TYPE_ORDER.indexOf(b) + 1 || 99));
+    groupsEl.replaceChildren(); jump.replaceChildren();
+    if (!types.length) groupsEl.append(el('div', { class: 'frame empty', text: 'No uniques match.' }));
+    types.forEach(t => {
+      const items = by.get(t).sort(cmp);
+      const usedN = items.filter(u => share(u) > 0).length;
+      jump.append(el('a', { href: '#' + slug(t) }, plural(t) + ' ', el('small', { text: String(items.length) })));
+      const gb = el('button', { type: 'button', class: 'gbtn', text: 'Select used' });
+      gb.title = 'Tick every unique in this group that the selected builds use';
+      gb.onclick = () => { items.filter(u => share(u) > 0).forEach(u => state.sel.add(u.name)); save(); render(); tray(); };
+      groupsEl.append(el('section', { class: 'group frame', id: slug(t) },
+        el('div', { class: 'ghead' }, el('h2', { text: plural(t) }), el('span', { class: 'cnt', text: `${items.length} uniques${usedN ? ` · ${usedN} used` : ''}` }), usedN ? gb : null),
+        el('div', { class: 'rows' }, ...items.map(row))));
+    });
+  }
+
+  const trayEl = document.getElementById('tray'), toast = document.getElementById('toast');
+  function tray() {
+    const n = state.sel.size;
+    trayEl.classList.toggle('on', n > 0);
+    document.getElementById('tn').textContent = `${n} selected`;
+    document.getElementById('tl').textContent = [...state.sel].sort().join(', ');
+  }
+  document.getElementById('copy').onclick = async () => {
+    const text = [...state.sel].sort().join('\n');
+    try { await navigator.clipboard.writeText(text); toast.textContent = 'Copied'; }
+    catch (e) { const ta = el('textarea'); ta.value = text; document.body.append(ta); ta.select(); try { document.execCommand('copy'); toast.textContent = 'Copied'; } catch (_) { toast.textContent = 'Copy failed'; } ta.remove(); }
+    setTimeout(() => toast.textContent = '', 1800);
+  };
+  document.getElementById('clear').onclick = () => { state.sel.clear(); save(); render(); tray(); };
+
+  render(); tray();
+})();
+</script>
