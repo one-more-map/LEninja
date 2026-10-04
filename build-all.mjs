@@ -9,8 +9,9 @@ import { execFileSync } from 'node:child_process';
 const builds = JSON.parse(fs.readFileSync('builds.json', 'utf8')).map(b => {
   const dir = path.join('data', 'snapshots', b.slug);
   const snaps = (fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.json')) : [])
-    .map(f => { const file = path.join(dir, f); const { meta } = JSON.parse(fs.readFileSync(file, 'utf8')); return { file, date: meta.scrapedAt, total: meta.total }; })
-    .sort((x, y) => new Date(x.date) - new Date(y.date));
+    .map(f => { const file = path.join(dir, f); const { meta } = JSON.parse(fs.readFileSync(file, 'utf8')); return { file, date: meta.scrapedAt, total: meta.total, order: meta.order || 0, sub: meta.snapSub }; })
+    // meta.order lets past-ladder snapshots (day-1, day-2) scraped on the same day sort before the live one
+    .sort((x, y) => x.order - y.order || new Date(x.date) - new Date(y.date));
   return { ...b, snaps };
 }).filter(b => b.snaps.length);
 const skillIcons = fs.existsSync('data/skill-icons.json') ? JSON.parse(fs.readFileSync('data/skill-icons.json', 'utf8')) : {};
@@ -19,7 +20,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const cards = builds.map(b => {
   const base = b.out.replace(/\.html$/, ''), last = b.snaps.length - 1;
   const pageOf = i => `${base}-day${i + 1}.html`;
-  const list = cur => b.snaps.map((s, i) => ({ label: `Day ${i + 1}`, date: s.date, total: s.total, href: i === last ? b.out : pageOf(i), on: i === cur }));
+  const list = cur => b.snaps.map((s, i) => ({ label: `Day ${i + 1}`, date: s.date, total: s.total, sub: s.sub, href: i === last ? b.out : pageOf(i), on: i === cur }));
   b.snaps.forEach((s, i) => {
     const env = { ...process.env, LENINJA_SNAPSHOTS: JSON.stringify(list(i)) };
     execFileSync(process.execPath, ['build.mjs', s.file, i === last ? b.out : pageOf(i)], { stdio: 'inherit', env });

@@ -508,7 +508,7 @@ catch(_){prompt('LE Ninja: copy this text and paste it into LE Ninja',txt)}
     const b = document.createElement('span'); b.className = 'what'; b.textContent = META.skills.length ? META.skills.join(' · ') : 'All builds'; h1.append(b);
     const tags = document.getElementById('tags');
     const pages = Math.ceil(META.total / 50);
-    [META.baseClass, `Top ${META.total} characters`, `${pages} ladder page${pages === 1 ? '' : 's'}`].forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); });
+    [META.baseClass, `Top ${META.total} characters`, `${pages} ladder page${pages === 1 ? '' : 's'}`, ...(META.gearNote ? [META.gearNote] : [])].forEach(t => { const s = document.createElement('span'); s.className = 'tag'; s.textContent = t; tags.append(s); });
     const d = new Date(META.scrapedAt);
     document.getElementById('snap').textContent = 'Data scraped ' + d.toLocaleString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
     // Snapshot switcher: each scrape is its own page, newest is the build's main page
@@ -518,7 +518,7 @@ catch(_){prompt('LE Ninja: copy this text and paste it into LE Ninja',txt)}
       META.snapshots.forEach(s => {
         const a = document.createElement('a'); a.href = s.href; a.textContent = s.label;
         if (s.on) a.setAttribute('aria-current', 'page');
-        const sm = document.createElement('small'); sm.textContent = `${new Date(s.date).toLocaleDateString(undefined, {day:'numeric', month:'short'})} · ${s.total}`; a.append(sm);
+        const sm = document.createElement('small'); sm.textContent = `${s.sub || new Date(s.date).toLocaleDateString(undefined, {day:'numeric', month:'short'})} · ${s.total}`; a.append(sm);
         a.title = `Scraped ${new Date(s.date).toLocaleString()} · top ${s.total} characters`;
         nav.append(a);
       });

@@ -1,5 +1,6 @@
 [
   { "slug": "spellblade-surge-firebrand", "out": "leninja.html" },
   { "slug": "void-knight-shield-throw", "out": "void-knight-shield-throw.html" },
-  { "slug": "bladedancer-dreamslash-shift-shadow-cascade", "out": "bladedancer-dreamslash-shift-shadow-cascade.html" }
+  { "slug": "bladedancer-dreamslash-shift-shadow-cascade", "out": "bladedancer-dreamslash-shift-shadow-cascade.html" },
+  { "slug": "lich-flay", "out": "lich-flay.html" }
 ]
