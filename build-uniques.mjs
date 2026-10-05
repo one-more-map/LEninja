@@ -6,6 +6,7 @@ import path from 'node:path';
 
 const db = JSON.parse(fs.readFileSync('data/uniques-db.json', 'utf8'));
 const icons = JSON.parse(fs.readFileSync('data/icons.json', 'utf8'));
+const links = JSON.parse(fs.readFileSync('data/let-links.json', 'utf8')); // name -> lastepochtools /db/items/ id
 const builds = JSON.parse(fs.readFileSync('builds.json', 'utf8')).map(b => {
   const dir = path.join('data', 'snapshots', b.slug);
   if (!fs.existsSync(dir)) return null;
@@ -34,7 +35,7 @@ builds.forEach((b, bi) => {
 });
 
 const uniques = db.filter(x => !x[8]).map(([name, type, base, , lvl, set, ww, random, , , odds]) => ({
-  name, type, base, lvl, set, ww, random, odds, use: builds.map((_, i) => usage[name]?.[i] || null),
+  name, type, base, lvl, set, ww, random, odds, let: links[name] || null, use: builds.map((_, i) => usage[name]?.[i] || null),
 }));
 const meta = {
   builds: builds.map(b => ({ label: b.data.meta.mastery + ' ' + (b.data.meta.skills || []).join(' + '), out: b.out, gear: b.data.rows.filter(r => !r.ng).length })),

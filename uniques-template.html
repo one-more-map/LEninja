@@ -76,6 +76,11 @@ select{background:var(--void);border:1px solid var(--line);border-radius:2px;pad
 .nm{min-width:0}
 .nm b{display:block;font-family:var(--ui);font-size:16px;font-weight:600;color:var(--r-unique);overflow-wrap:anywhere}
 .nm b.set{color:var(--r-set)} .nm b.ww{color:var(--ww)}
+.nm a.let{text-decoration:none;color:inherit}
+.nm a.let b::after{content:' 97';font-size:12px;color:var(--dim);opacity:0;transition:opacity .15s}
+.nm a.let:hover b{text-decoration:underline;text-underline-offset:3px}
+.nm a.let:hover b::after,.nm a.let:focus-visible b::after{opacity:1}
+.ico-a{display:block}
 .nm .base{font-family:var(--ui);font-size:13px;color:var(--dim)}
 .badge{display:inline-block;margin-left:6px;padding:0 5px;border:1px solid var(--line);border-radius:2px;font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);vertical-align:1px}
 .badge.boss{color:var(--gold);border-color:var(--gold-dim)}
@@ -217,14 +222,19 @@ footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
     }
     return w;
   }
+  // Name and icon open the item on Last Epoch Tools in a new tab
+  function letLink(u, child, icon) {
+    if (!u.let) return child;
+    return el('a', { class: icon ? 'let ico-a' : 'let', href: 'https://www.lastepochtools.com/db/items/' + u.let, target: '_blank', rel: 'noopener', title: 'Open ' + u.name + ' on Last Epoch Tools' }, child);
+  }
   function row(u) {
     const cb = el('input', { type: 'checkbox', 'aria-label': 'Select ' + u.name });
     cb.checked = state.sel.has(u.name);
     const r = el('div', { class: 'row' + (cb.checked ? ' sel' : '') },
       cb,
-      el('div', { class: 'ico' }, ICONS[u.name] ? el('img', { src: ICONS[u.name], alt: '', loading: 'lazy' }) : null),
+      el('div', { class: 'ico' }, ICONS[u.name] ? letLink(u, el('img', { src: ICONS[u.name], alt: '', loading: 'lazy' }), true) : null),
       el('div', { class: 'nm' },
-        el('b', { class: u.set ? 'set' : u.ww ? 'ww' : '', text: u.name }),
+        letLink(u, el('b', { class: u.set ? 'set' : u.ww ? 'ww' : '', text: u.name })),
         el('span', { class: 'base', text: `${u.base || u.type} · lvl ${u.lvl}` }),
         u.random ? null : el('span', { class: 'badge boss', text: 'Targeted drop', title: "Doesn't drop randomly: comes from a boss, dungeon or other specific source" })),
       useCell(u),
