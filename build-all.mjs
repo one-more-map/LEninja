@@ -81,13 +81,14 @@ dd{margin:0;font-size:20px;font-weight:600;color:var(--frost);font-variant-numer
 .uniq span{color:var(--dim);font-weight:500;margin-left:4px}
 .foot{font-size:13px;color:var(--faint);margin-top:auto}
 footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
+.fb{margin:10px 0 0}.fb a{color:var(--gold-hi);text-decoration:none;border-bottom:1px solid rgba(201,168,90,.35)}.fb a:hover{border-bottom-color:currentColor}
 </style></head>
 <body><div class="wrap">
 <header><div class="brand">LE NINJA</div><div class="sub">${esc(season)} &middot; corruption ladder builds</div><a class="uq" href="uniques.html">Browse every unique &amp; its LP odds &rarr;</a></header>
 <div class="grid">
 ${cards}
 </div>
-<footer>Data from lastepochtools.com &middot; item and skill art &copy; Eleventh Hour Games</footer>
+<footer>Data from lastepochtools.com &middot; item and skill art &copy; Eleventh Hour Games<p class="fb">Found a bug or have an idea? <a href="https://github.com/one-more-map/LEninja/issues/new?labels=bug&amp;title=Bug%3A%20" target="_blank" rel="noopener">Report a bug</a> &middot; <a href="https://github.com/one-more-map/LEninja/issues/new?labels=enhancement&amp;title=Feature%3A%20" target="_blank" rel="noopener">Suggest a feature</a> &middot; <a href="https://github.com/one-more-map/LEninja" target="_blank" rel="noopener">GitHub</a></p></footer>
 </div></body></html>
 `;
 fs.writeFileSync('index.html', html);

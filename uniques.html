@@ -34,6 +34,7 @@ button,input,select{font:inherit;color:inherit}
 .nav .on{color:var(--frost);background:linear-gradient(180deg,transparent,rgba(98,214,234,.12));box-shadow:inset 0 -2px 0 var(--rift)}
 .bar .note{font-family:var(--ui);font-size:13px;color:var(--faint);white-space:nowrap}
 @media (max-width:760px){.bar .note,.nav span:not(.on){display:none}.nav{margin:0 0 0 auto;font-size:12px}.nav a{padding:0 8px}.bar-in{gap:8px}.brand{font-size:14px;gap:6px;white-space:nowrap}.brand svg{width:20px;height:20px}}
+@media (max-width:480px){.nav .nav-fb{display:none}}
 
 .hero{text-align:center;padding:28px 16px 26px;border-bottom:1px solid var(--line);
   background:radial-gradient(600px 220px at 50% 70%,rgba(98,214,234,.14),transparent 70%),radial-gradient(900px 300px at 50% 0,rgba(201,164,92,.08),transparent 70%)}
@@ -115,6 +116,7 @@ select{background:var(--void);border:1px solid var(--line);border-radius:2px;pad
 .btn.ghost{border-color:var(--line);background:transparent;color:var(--dim)}
 .toast{font-family:var(--ui);font-size:13px;color:var(--rift)}
 footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
+.fb{margin:10px 0 0}.fb a{color:var(--gold-hi);text-decoration:none;border-bottom:1px solid rgba(201,168,90,.35)}.fb a:hover{border-bottom-color:currentColor}
 </style>
 
 <div class="bar"><div class="bar-in">
@@ -122,7 +124,7 @@ footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
     <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#c9a45c" stroke-width="1.2"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="#62d6ea" stroke-width=".8" stroke-dasharray="1.5 2.4"/><path d="M12 5.5V12l4 2.6" fill="none" stroke="#efd59a" stroke-width="1.6" stroke-linecap="round"/></svg>
     LE NINJA
   </a>
-  <nav class="nav" aria-label="Sections"><a href="index.html">BUILDS</a><a class="on" href="uniques.html">UNIQUES</a><span>LADDERS</span></nav>
+  <nav class="nav" aria-label="Sections"><a href="index.html">BUILDS</a><a class="on" href="uniques.html">UNIQUES</a><a class="nav-fb" href="https://github.com/one-more-map/LEninja/issues" target="_blank" rel="noopener" title="Report a bug or suggest a feature on GitHub">FEEDBACK</a></nav>
   <span class="note" id="note"></span>
 </div></div>
 
@@ -144,7 +146,7 @@ footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
   </div>
   <nav class="jump" id="jump" aria-label="Item types"></nav>
   <div id="groups"></div>
-  <footer>LP odds are lastepochtools' drop odds at area level 100 (1 to 4 LP, all LP rolls counted). Usage counts characters with gear on the latest snapshot of each build. Data from lastepochtools.com &middot; item art &copy; Eleventh Hour Games</footer>
+  <footer>LP odds are lastepochtools' drop odds at area level 100 (1 to 4 LP, all LP rolls counted). Usage counts characters with gear on the latest snapshot of each build. Data from lastepochtools.com &middot; item art &copy; Eleventh Hour Games<p class="fb">Found a bug or have an idea? <a href="https://github.com/one-more-map/LEninja/issues/new?labels=bug&amp;title=Bug%3A%20" target="_blank" rel="noopener">Report a bug</a> &middot; <a href="https://github.com/one-more-map/LEninja/issues/new?labels=enhancement&amp;title=Feature%3A%20" target="_blank" rel="noopener">Suggest a feature</a> &middot; <a href="https://github.com/one-more-map/LEninja" target="_blank" rel="noopener">GitHub</a></p></footer>
 </main>
 
 <div class="tray" id="tray" aria-live="polite"><div class="tray-in">
