@@ -13,7 +13,7 @@ if (!window.__en) window.__en = await fetch('/data/version150/i18n/full/en.json'
 const T = k => ((__en[k] || '') + '').replace(/''/g, "'").trim();
 const U = itemDB.uniqueList.uniques, EQ = itemDB.itemList.equippable, AL = itemDB.affixList, AM = {};
 for (const g of ['singleAffixes', 'multiAffixes']) (Array.isArray(AL[g]) ? AL[g] : Object.values(AL[g])).forEach(a => { if (a) AM[a.affixId] = a });
-const aff = a => AM[+n_xqb.Sg(a.id.slice(1))]; const mn = f => [aff(f) ? T(aff(f).affixDisplayNameKey) : 'Unknown mod', f.tier + 1];
+const aff = a => AM[+n_xqb.Sg(a.id.slice(1))]; const mn = f => [aff(f) ? T(aff(f).affixDisplayNameKey) : 'Unknown mod', f.tier];
 window.__spr = {}; window.__uq = {}; window.__skspr = {};
 const item = e => {
   if (!e || !e.id) return null; const s = n_xqb.Sg(e.id.slice(1)) || ''; const af = e.affixes || [];
@@ -26,7 +26,7 @@ const item = e => {
     return [k, n, e.corruptedAffix ? 1 : 0, k === 'l' && !ww ? lp.map(mn) : null, null, null, null, vr]
   }
   const si = EQ[+s.slice(1, 4)]?.subItems?.[+s.slice(4, 7)]; const n = T(si && si.displayNameKey) || 'Unknown item'; if (si) __spr[n] = String(si.sprite || '').replace(/^I/, '');
-  return [af.some(a => a.tier + 1 >= 6) ? 'e' : 'r', n, e.corruptedAffix ? 1 : 0, null, af.map(mn), e.corruptedAffix ? mn(e.corruptedAffix) : null, e.sealedAffix ? mn(e.sealedAffix) : null]
+  return [af.some(a => a.tier >= 6) ? 'e' : 'r', n, e.corruptedAffix ? 1 : 0, null, af.map(mn), e.corruptedAffix ? mn(e.corruptedAffix) : null, e.sealedAffix ? mn(e.sealedAffix) : null]
 };
 const AB = LEAbilities.abilityList;
 const SK = id => { const a = AB[id]; const n = a && a.nameKey ? T(a.nameKey) : (id === 'arcas' ? 'Arcane Ascendance' : null); if (n && a && a.abilitySprite) __skspr[n] = +String(a.abilitySprite).replace('a-r-', ''); return n };

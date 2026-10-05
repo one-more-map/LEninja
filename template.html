@@ -470,12 +470,12 @@ for(const g of ['singleAffixes','multiAffixes'])(Array.isArray(AL[g])?AL[g]:Obje
 const aff=a=>AM[+n_xqb.Sg(a.id.slice(1))];
 const item=e=>{if(!e||!e.id)return null;const s=n_xqb.Sg(e.id.slice(1))||'';const af=e.affixes||[];let k,n,ww=false;
  if(e.id[0]==='U'){const u=U[+s.slice(3,6)];n=T(u&&u.displayNameKey);ww=!!u&&u.legendaryType==1;const lp=af.filter(a=>{const A=aff(a);return !A||A.specialAffixType!=7});k=u&&u.isSetItem?'s':lp.length?'l':'u';
-  const x=[k,n||'Unknown item',e.corruptedAffix?1:0];if(k==='l'&&!ww){x.push(lp.map(a=>{const A=aff(a);return[A?T(A.affixDisplayNameKey):'Unknown mod',a.tier+1]}))}const vr=af.filter(a=>{const A=aff(a);return A&&A.specialAffixType==7}).map(a=>T(aff(a).affixDisplayNameKey)).join(' / ');if(vr){while(x.length<7)x.push(null);x.push(vr)}return x}
+  const x=[k,n||'Unknown item',e.corruptedAffix?1:0];if(k==='l'&&!ww){x.push(lp.map(a=>{const A=aff(a);return[A?T(A.affixDisplayNameKey):'Unknown mod',a.tier]}))}const vr=af.filter(a=>{const A=aff(a);return A&&A.specialAffixType==7}).map(a=>T(aff(a).affixDisplayNameKey)).join(' / ');if(vr){while(x.length<7)x.push(null);x.push(vr)}return x}
  const si=EQ[+s.slice(1,4)]&&EQ[+s.slice(1,4)].subItems&&EQ[+s.slice(1,4)].subItems[+s.slice(4,7)];
- const mn=f=>[aff(f)?T(aff(f).affixDisplayNameKey):'Unknown mod',f.tier+1];return[af.some(a=>a.tier+1>=6)?'e':'r',T(si&&si.displayNameKey)||'Unknown item',e.corruptedAffix?1:0,null,af.map(mn),e.corruptedAffix?mn(e.corruptedAffix):null,e.sealedAffix?mn(e.sealedAffix):null]};
+ const mn=f=>[aff(f)?T(aff(f).affixDisplayNameKey):'Unknown mod',f.tier];return[af.some(a=>a.tier>=6)?'e':'r',T(si&&si.displayNameKey)||'Unknown item',e.corruptedAffix?1:0,null,af.map(mn),e.corruptedAffix?mn(e.corruptedAffix):null,e.sealedAffix?mn(e.sealedAffix):null]};
 const data=d.buildInfo.data,e={};for(const[s,v]of Object.entries(data.equipment||{})){const x=item(v);if(x)e[s]=x}
 const AB=LEAbilities.abilityList,SK=id=>AB[id]&&AB[id].nameKey?T(AB[id].nameKey):null;
-const out={leninja:1,a:d.charInfo.accountName,c:d.charInfo.characterName,l:d.buildInfo.level,e,i:(data.idols||[]).filter(v=>v&&v.id).map(v=>{const x=item(v);if(v.id[0]!=='U'){x[3]=x[3]||null;x[4]=(v.affixes||[]).map(f=>{const A=aff(f);return[A?T(A.affixDisplayNameKey):'Unknown mod',f.tier+1]});const c=v.corruptedAffix;x[5]=c?[(aff(c)?T(aff(c).affixDisplayNameKey):'Unknown mod'),c.tier+1]:null}return x}),
+const out={leninja:1,a:d.charInfo.accountName,c:d.charInfo.characterName,l:d.buildInfo.level,e,i:(data.idols||[]).filter(v=>v&&v.id).map(v=>{const x=item(v);if(v.id[0]!=='U'){x[3]=x[3]||null;x[4]=(v.affixes||[]).map(f=>{const A=aff(f);return[A?T(A.affixDisplayNameKey):'Unknown mod',f.tier]});const c=v.corruptedAffix;x[5]=c?[(aff(c)?T(aff(c).affixDisplayNameKey):'Unknown mod'),c.tier]:null}return x}),
  sp:(data.skillTrees||[]).slice().sort((x,y)=>x.slotNumber-y.slotNumber).map(t=>[SK(t.treeID),t.level]).filter(x=>x[0]),
  hb:[...new Set((data.hud||[]).map(SK).filter(Boolean))]};
 const txt=JSON.stringify(out);
