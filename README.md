@@ -31,3 +31,7 @@ node build.mjs data/rage-of-the-frostborn_spellblade_surge_firebrand.json
 - `merge-*.cjs`: older incremental merges (LP, idols, exalted mods, refresh)
 - `scrape.mjs`: headless scraper (blocked by lastepochtools with a 403; kept for reference)
 - `data/`: datasets, sprite maps, LP odds and embedded icons
+
+## Retired (2026-10-06)
+
+The public site now points to https://www.lastepochtools.com/ladders/ (the Last Epoch Tools developer is building these features in). `node retire.mjs` writes that notice to index.html and turns every other page into a redirect to it. Templates, data and scripts are unchanged: `node build-all.mjs` restores the full site.

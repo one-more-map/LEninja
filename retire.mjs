@@ -1,4 +1,13 @@
-<!doctype html>
+// Retires the public site: index.html becomes one big link to the Last Epoch Tools ladders (which are getting
+// these features), and every other generated page just forwards to it, so old shared links land there too.
+// Templates, data and build scripts are untouched; run `node build-all.mjs` to bring the full site back.
+//   node retire.mjs
+import fs from 'node:fs';
+
+const TARGET = 'https://www.lastepochtools.com/ladders/';
+const keep = f => f === 'index.html' || f === 'template.html' || f.endsWith('-template.html') || f.startsWith('template-');
+
+const index = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LE Ninja</title>
@@ -22,6 +31,21 @@ p{margin:0 auto;max-width:56ch;font-size:16px;line-height:1.5;text-wrap:balance}
 </style>
 <main>
   <div class="brand">LE NINJA</div>
-  <a class="go" href="https://www.lastepochtools.com/ladders/">Go to the Last Epoch Tools ladders &rarr;<span>lastepochtools.com/ladders</span></a>
+  <a class="go" href="${TARGET}">Go to the Last Epoch Tools ladders &rarr;<span>lastepochtools.com/ladders</span></a>
   <p>The Last Epoch Tools developer has seen what LE Ninja was doing, and these features are being built into Last Epoch Tools shortly. Thanks to everyone who checked it out.</p>
 </main>
+`;
+fs.writeFileSync('index.html', index);
+
+// Every other page forwards to the notice
+const stub = `<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LE Ninja</title>
+<meta http-equiv="refresh" content="0; url=index.html">
+<link rel="canonical" href="index.html">
+<a href="index.html">LE Ninja has moved &rarr;</a>
+`;
+const pages = fs.readdirSync('.').filter(f => f.endsWith('.html') && !keep(f));
+pages.forEach(f => fs.writeFileSync(f, stub));
+console.log(`index.html is the notice; ${pages.length} pages forward to it`);
