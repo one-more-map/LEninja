@@ -6,6 +6,7 @@ const BUILDS = [
   { slug: 'sb', cls: 12, skills: ['su5g3', 'f1b4d'], limit: 500 },
   { slug: 'vk', cls: 21, skills: ['st31io'], limit: 500 },
   { slug: 'bd', cls: 41, skills: ['dr4sl', 'shiif', 'dagg3'], limit: 500 },
+  { slug: 'lich', cls: 32, skills: ['fl44'], limit: 500 },
 ];
 if (!window.__en) window.__en = await fetch('/data/version150/i18n/full/en.json').then(r => r.json());
 const T = k => ((__en[k] || '') + '').replace(/''/g, "'").trim();
