@@ -17,3 +17,7 @@ Skill ids: look up in `LEAbilities.abilityList` (Surge su5g3, Firebrand f1b4d, S
 Dreamslash dr4sl, Shift shiif, Shadow Cascade dagg3, Flay fl44, Hammer Throw ht16aw).
 Unique variants: special affixes (specialAffixType 7) are kept as item index 7, e.g. Unsated Rage "You have Predator Rage",
 Withstand the Elements overcap bonuses, Frostborn Solitude stat type. They are not Legendary Potential.
+
+## Meta page (whole ladder)
+
+`ladder.js` exports the top 10,000 (mastery, skills, rank, corruption) for `meta.html`; no profile fetches, so it runs in a second. Steps are in the file header. The in-app browser blocks `fetch` to localhost (ERR_BLOCKED_BY_CLIENT), so chunks still go across by hand.
