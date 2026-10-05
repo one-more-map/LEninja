@@ -7,6 +7,7 @@ const BUILDS = [
   { slug: 'vk', cls: 21, skills: ['st31io'], limit: 500 },
   { slug: 'bd', cls: 41, skills: ['dr4sl', 'shiif', 'dagg3'], limit: 500 },
   { slug: 'lich', cls: 32, skills: ['fl44'], limit: 500 },
+  { slug: 'pal', cls: 23, skills: ['ht16aw'], limit: 500 },
 ];
 if (!window.__en) window.__en = await fetch('/data/version150/i18n/full/en.json').then(r => r.json());
 const T = k => ((__en[k] || '') + '').replace(/''/g, "'").trim();
@@ -19,7 +20,10 @@ const item = e => {
   if (e.id[0] === 'U') {
     const u = U[+s.slice(3, 6)]; const n = T(u && u.displayNameKey) || 'Unknown item'; if (u) { __spr[n] = String(u.sprite || '').replace(/^I/, ''); __uq[n] = u }
     const ww = !!u && u.legendaryType == 1; const lp = af.filter(a => { const A = aff(a); return !A || A.specialAffixType != 7 });
-    const k = u && u.isSetItem ? 's' : lp.length ? 'l' : 'u'; return [k, n, e.corruptedAffix ? 1 : 0, k === 'l' && !ww ? lp.map(mn) : null, null, null, null]
+    const k = u && u.isSetItem ? 's' : lp.length ? 'l' : 'u';
+    // Special affixes (type 7) are the unique's variant, e.g. Unsated Rage's "You have Predator Rage"; not LP
+    const vr = af.filter(a => { const A = aff(a); return A && A.specialAffixType == 7 }).map(a => T(aff(a).affixDisplayNameKey)).join(' / ') || null;
+    return [k, n, e.corruptedAffix ? 1 : 0, k === 'l' && !ww ? lp.map(mn) : null, null, null, null, vr]
   }
   const si = EQ[+s.slice(1, 4)]?.subItems?.[+s.slice(4, 7)]; const n = T(si && si.displayNameKey) || 'Unknown item'; if (si) __spr[n] = String(si.sprite || '').replace(/^I/, '');
   return [af.some(a => a.tier + 1 >= 6) ? 'e' : 'r', n, e.corruptedAffix ? 1 : 0, null, af.map(mn), e.corruptedAffix ? mn(e.corruptedAffix) : null, e.sealedAffix ? mn(e.sealedAffix) : null]

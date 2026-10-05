@@ -12,6 +12,8 @@ Every file in `data/snapshots/<build-slug>/` becomes a snapshot: oldest = Day 1,
 and the build's main page always shows the newest. Builds are listed in `builds.json`.
 
 Ladder file (v2): `{s: string table, e: [[score, ?, account, character, classCode, level, [skill idx into s], ...]]}`,
-sorted by rank. classCode = base*10 + mastery: Spellblade 12, Void Knight 21, Bladedancer 41.
+sorted by rank. classCode = base*10 + mastery: Spellblade 12, Void Knight 21, Bladedancer 41, Lich 32, Forge Guard 22, Paladin 23.
 Skill ids: look up in `LEAbilities.abilityList` (Surge su5g3, Firebrand f1b4d, Shield Throw st31io,
-Dreamslash dr4sl, Shift shiif, Shadow Cascade dagg3).
+Dreamslash dr4sl, Shift shiif, Shadow Cascade dagg3, Flay fl44, Hammer Throw ht16aw).
+Unique variants: special affixes (specialAffixType 7) are kept as item index 7, e.g. Unsated Rage "You have Predator Rage",
+Withstand the Elements overcap bonuses, Frostborn Solitude stat type. They are not Legendary Potential.

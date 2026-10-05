@@ -116,6 +116,10 @@ select{background:var(--void);border:1px solid var(--line);border-radius:2px;pad
 .btn.ghost{border-color:var(--line);background:transparent;color:var(--dim)}
 .toast{font-family:var(--ui);font-size:13px;color:var(--rift)}
 footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
+.ub.vars{align-items:flex-start}
+.vlist{display:flex;flex-wrap:wrap;gap:3px;grid-column:2/-1}
+.vchip{font-size:11px;color:var(--frost);background:rgba(98,214,234,.08);border:1px solid rgba(98,214,234,.25);border-radius:2px;padding:0 5px;white-space:normal;overflow-wrap:anywhere}
+.vchip b{font-weight:600;color:var(--dim);margin-left:4px}
 .fb{margin:10px 0 0}.fb a{color:var(--gold-hi);text-decoration:none;border-bottom:1px solid rgba(201,168,90,.35)}.fb a:hover{border-bottom-color:currentColor}
 </style>
 
@@ -206,6 +210,7 @@ footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
     return el('div', { class: 'lp', title: `Chance to drop with exactly 0 LP: ${pct(u.odds[0], 1)}` },
       ...[1, 2, 3, 4].map(k => el('div', {}, el('b', { text: k + ' LP' }), el('span', { text: pct(u.odds[k]) }))));
   }
+  const varLabel = v => v.replace(/^You have /, '').replace(/\s*\(up to [^)]*\)/g, '');
   function useCell(u) {
     const list = u.use.map((x, i) => x ? [i, x] : null).filter(Boolean).filter(([i]) => state.build < 0 || i === state.build)
       .sort((a, b) => b[1][0] / BUILDS[b[0]].gear - a[1][0] / BUILDS[a[0]].gear);
@@ -222,6 +227,11 @@ footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
       w.append(el('div', { class: 'ub seen' }, el('span', { class: 'bn', text: 'Seen on players' }),
         el('span', { class: 'lps', text: seen.map((n, k) => n && k ? `${k} LP ×${n}` : null).filter(Boolean).join(' · ') })));
     }
+    // Variant players picked (Unsated Rage's rage type, etc.)
+    const vars = {}; list.forEach(([, x]) => Object.entries(x[2] || {}).forEach(([v, n]) => vars[v] = (vars[v] || 0) + n));
+    const vs = Object.entries(vars).sort((a, b) => b[1] - a[1]), vn = vs.reduce((t, [, n]) => t + n, 0);
+    if (vs.length) w.append(el('div', { class: 'ub vars' }, el('span', { class: 'bn', text: 'Variants' }),
+      el('span', { class: 'vlist' }, vs.map(([v, n]) => el('span', { class: 'vchip', title: `${varLabel(v)}: ${n} of ${vn} players` }, varLabel(v), el('b', { text: Math.round(n / vn * 100) + '%' }))))));
     return w;
   }
   // Name and icon open the item on Last Epoch Tools in a new tab

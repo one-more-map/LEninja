@@ -9,6 +9,7 @@ const mod = m => [s[m[0]], m[1]];
 const item = x => {
   const out = [x[0], s[x[1]], x[2], x[3] ? x[3].map(mod) : null];
   if (x[4] || x[5] || x[6]) out.push(x[4] ? x[4].map(mod) : [], x[5] ? mod(x[5]) : null, x[6] ? mod(x[6]) : null);
+  if (x[7]) { while (out.length < 7) out.push(null); out.push(s[x[7]]); } // unique variant, e.g. "You have Predator Rage"
   return out;
 };
 const rows = P.rows.map(([a, c, r, sc, l, sk, f, sp, hb, e, i]) => {

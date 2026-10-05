@@ -205,6 +205,11 @@ tr.open .who .c svg{transform:rotate(90deg);color:var(--rift)}
 .tipcard{position:fixed;z-index:60;max-width:340px;min-width:220px;padding:10px 12px;border:1px solid var(--c);border-top-width:2px;border-radius:3px;background:rgba(10,14,21,.97);box-shadow:0 8px 24px rgba(0,0,0,.6);font-family:var(--ui);font-size:13px;color:var(--text);pointer-events:none;display:flex;flex-direction:column;gap:6px}
 .tc-name{font-family:var(--display);font-size:15px;font-weight:600;line-height:1.2}
 .tc-type{font-size:12px;color:var(--dim);margin-top:-4px}
+.tc-var{font-size:13px;color:var(--frost);font-weight:600}
+.vars{display:flex;flex-wrap:wrap;gap:3px;padding:0 4px 6px 44px;margin-top:-2px}
+.vchip{font-size:11px;color:var(--frost);background:rgba(98,214,234,.08);border:1px solid rgba(98,214,234,.25);border-radius:2px;padding:0 5px;white-space:normal;overflow-wrap:anywhere}
+.vchip b{font-weight:600;color:var(--dim);margin-left:4px}
+.list .t .vr,.imods li.vr{display:block;font-size:12px;color:var(--frost);font-weight:600}
 .tc-lp{color:var(--lp);font-weight:700;font-size:13px}
 .tc-lp span{font-weight:500;color:color-mix(in srgb,var(--lp) 65%,var(--dim))}
 .tc-mods{list-style:none;margin:0;padding:6px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
@@ -465,7 +470,7 @@ for(const g of ['singleAffixes','multiAffixes'])(Array.isArray(AL[g])?AL[g]:Obje
 const aff=a=>AM[+n_xqb.Sg(a.id.slice(1))];
 const item=e=>{if(!e||!e.id)return null;const s=n_xqb.Sg(e.id.slice(1))||'';const af=e.affixes||[];let k,n,ww=false;
  if(e.id[0]==='U'){const u=U[+s.slice(3,6)];n=T(u&&u.displayNameKey);ww=!!u&&u.legendaryType==1;const lp=af.filter(a=>{const A=aff(a);return !A||A.specialAffixType!=7});k=u&&u.isSetItem?'s':lp.length?'l':'u';
-  const x=[k,n||'Unknown item',e.corruptedAffix?1:0];if(k==='l'&&!ww){x.push(lp.map(a=>{const A=aff(a);return[A?T(A.affixDisplayNameKey):'Unknown mod',a.tier+1]}))}return x}
+  const x=[k,n||'Unknown item',e.corruptedAffix?1:0];if(k==='l'&&!ww){x.push(lp.map(a=>{const A=aff(a);return[A?T(A.affixDisplayNameKey):'Unknown mod',a.tier+1]}))}const vr=af.filter(a=>{const A=aff(a);return A&&A.specialAffixType==7}).map(a=>T(aff(a).affixDisplayNameKey)).join(' / ');if(vr){while(x.length<7)x.push(null);x.push(vr)}return x}
  const si=EQ[+s.slice(1,4)]&&EQ[+s.slice(1,4)].subItems&&EQ[+s.slice(1,4)].subItems[+s.slice(4,7)];
  const mn=f=>[aff(f)?T(aff(f).affixDisplayNameKey):'Unknown mod',f.tier+1];return[af.some(a=>a.tier+1>=6)?'e':'r',T(si&&si.displayNameKey)||'Unknown item',e.corruptedAffix?1:0,null,af.map(mn),e.corruptedAffix?mn(e.corruptedAffix):null,e.sealedAffix?mn(e.sealedAffix):null]};
 const data=d.buildInfo.data,e={};for(const[s,v]of Object.entries(data.equipment||{})){const x=item(v);if(x)e[s]=x}
@@ -571,6 +576,8 @@ catch(_){prompt('LE Ninja: copy this text and paste it into LE Ninja',txt)}
   const COLOR = {u:'var(--r-unique)', l:'var(--r-unique)', s:'var(--r-set)', e:'var(--r-exalted)', r:'var(--r-rare)', k:'var(--text)'};
   const RANK = {k:0, s:1, u:2, l:2, e:3, r:4};
   const isUniq = k => k === 'u' || k === 'l' || k === 's';
+  // Unique variants (Unsated Rage's rage type, etc.) live at item index 7
+  const varLabel = v => v ? v.replace(/^You have /, '').replace(/\s*\(up to [^)]*\)/g, '') : '';
 
   const state = {filters:[], q:'', bases:false, open:{}, faction:'all', sort:'r', expanded:new Set(), limit:PAGE};
   state.names = false;
@@ -605,7 +612,7 @@ catch(_){prompt('LE Ninja: copy this text and paste it into LE Ninja',txt)}
     const src = ICONS[name];
     const node = el(tag, {class:'ic' + (cor ? ' cor' : '') + (kind === 'l' ? ' leg' : '') + (opts.cls ? ' ' + opts.cls : ''), style:`--c:${COLOR[kind]}` + (opts.size ? `;--s:${opts.size}px` : ''),
       title:opts.card ? null : (opts.title || `${name} · ${KIND[kind]}${cor ? ' · corrupted' : ''}`) + (lp ? `
-LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${m[1]}`).join(', ') : '') + (isWW(name) ? "\nWeaver's Will item (no Legendary Potential)" : '') + (!lp && item[4] && item[4].length ? '\n' + item[4].map(m => `${m[0]} T${m[1]}`).join('\n') : '') + (item[6] ? `\nSealed: ${item[6][0]} T${item[6][1]}` : '') + (!lp && item[5] ? `\nCorrupted: ${item[5][0]} T${item[5][1]}` : ''), onclick:opts.onclick, type:opts.onclick ? 'button' : null, 'data-slot':opts.slot},
+LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${m[1]}`).join(', ') : '') + (item[7] ? '\nVariant: ' + varLabel(item[7]) : '') + (isWW(name) ? "\nWeaver's Will item (no Legendary Potential)" : '') + (!lp && item[4] && item[4].length ? '\n' + item[4].map(m => `${m[0]} T${m[1]}`).join('\n') : '') + (item[6] ? `\nSealed: ${item[6][0]} T${item[6][1]}` : '') + (!lp && item[5] ? `\nCorrupted: ${item[5][0]} T${item[5][1]}` : ''), onclick:opts.onclick, type:opts.onclick ? 'button' : null, 'data-slot':opts.slot},
       src ? el('img', {src, alt:name, loading:'lazy'}) : el('span', {class:'nog'}, name[0]), lp && !opts.noLp ? el('span', {class:'lpb'}, lp) : null);
     if (opts.card) attachCard(node, item, opts.card);
     return node;
@@ -622,6 +629,7 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
     const rows = [];
     rows.push(el('div', {class:'tc-name', style:`color:${COLOR[kind]}`}, name));
     rows.push(el('div', {class:'tc-type'}, [slotLabel, ww ? "Weaver's Will" : KIND[kind]].filter(Boolean).join(' · ')));
+    if (x[7]) rows.push(el('div', {class:'tc-var'}, varLabel(x[7])));
     if (lpMods.length) {
       rows.push(el('div', {class:'tc-lp'}, `Legendary Potential ${lpMods.length}`, lpOdds(name, lpMods.length) ? el('span', {}, ` · 1 in ${lpOdds(name, lpMods.length)} drops`) : null));
       rows.push(el('ul', {class:'tc-mods lp'}, lpMods.map(([m, t]) => el('li', {}, m, el('i', {}, 'T' + t)))));
@@ -722,11 +730,12 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
       const agg = new Map();
       for (const r of base) {
         const seen = new Set();
-        for (const [k, n, , mods] of s.get(r)) {
-          if (!agg.has(n)) agg.set(n, {name:n, kind:k, count:0, lp:0, lps:{}});
+        for (const x of s.get(r)) {
+          const [k, n, , mods] = x;
+          if (!agg.has(n)) agg.set(n, {name:n, kind:k, count:0, lp:0, lps:{}, vars:{}});
           const a = agg.get(n);
           if (RANK[k] < RANK[a.kind]) a.kind = k;
-          if (!seen.has(n)) { a.count++; if (k === 'l' && !isWW(n)) { a.lp++; const v = mods ? mods.length : 0; a.lps[v] = (a.lps[v] || 0) + 1; } seen.add(n); }
+          if (!seen.has(n)) { a.count++; if (k === 'l' && !isWW(n)) { a.lp++; const v = mods ? mods.length : 0; a.lps[v] = (a.lps[v] || 0) + 1; } if (x[7]) a.vars[x[7]] = (a.vars[x[7]] || 0) + 1; seen.add(n); }
         }
       }
       let list = [...agg.values()];
@@ -749,6 +758,9 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
         } else {
           sec.append(el('button', {class:'opt' + (on ? ' on' : ''), style:`--w:${pct}%;--c:${COLOR[a.kind]}`, 'aria-pressed':on, onclick:() => toggle(s.id, a.name), title},
             tile([a.kind, a.name, 0], {title}), el('span', {class:'nm'}, a.name, lp), el('span', {class:'pc'}, pct + '%'), el('span', {class:'br'}, el('i'))));
+          // Variant breakdown, e.g. which rage Unsated Rage rolled
+          const vs = Object.entries(a.vars).sort((p, q) => q[1] - p[1]), vn = vs.reduce((t, [, n]) => t + n, 0);
+          if (vs.length) sec.append(el('div', {class:'vars', title:`Variant known for ${vn} of ${a.count} characters with this item`}, vs.map(([v, n]) => el('span', {class:'vchip', title:`${varLabel(v)}: ${n} of ${vn}`}, varLabel(v), el('b', {}, Math.round(n / vn * 100) + '%')))));
         }
       });
       if (list.length > lim) sec.append(el('button', {class:'more', onclick:() => { state.open[s.id] = true; render(); }}, `Show ${list.length - lim} more`));
@@ -767,7 +779,7 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
       el('ul', {class:'list'}, [...EQUIP, 'idol_altar'].filter(k => r.e[k]).map(k => {
         const x = r.e[k];
         const ww = isWW(x[1]), m = ww ? [] : (x[3] || []);
-        return el('li', {style:`--c:${COLOR[x[0]]}`, class:dimCls(SLOT_OF(k), x).trim() || null}, tile(x, {card:SLOT_LABEL[k]}), el('span', {class:'t'}, el('b', {}, x[1]), el('small', {}, `${SLOT_LABEL[k]} · ${KIND[x[0]]}`, m.length ? el('span', {class:'lpt', title:lpTable(x[1])}, ` · LP ${m.length}`, lpOdds(x[1], m.length) ? el('span', {class:'odds'}, ` (1 in ${lpOdds(x[1], m.length)})`) : null) : null, ww ? " · Weaver's Will" : '', x[2] ? ' · corrupted' : ''),
+        return el('li', {style:`--c:${COLOR[x[0]]}`, class:dimCls(SLOT_OF(k), x).trim() || null}, tile(x, {card:SLOT_LABEL[k]}), el('span', {class:'t'}, el('b', {}, x[1]), x[7] ? el('span', {class:'vr'}, varLabel(x[7])) : null, el('small', {}, `${SLOT_LABEL[k]} · ${KIND[x[0]]}`, m.length ? el('span', {class:'lpt', title:lpTable(x[1])}, ` · LP ${m.length}`, lpOdds(x[1], m.length) ? el('span', {class:'odds'}, ` (1 in ${lpOdds(x[1], m.length)})`) : null) : null, ww ? " · Weaver's Will" : '', x[2] ? ' · corrupted' : ''),
           m.length ? el('ul', {class:'mods'}, m.map(([mod, tier]) => el('li', {}, mod, el('i', {}, 'T' + tier)))) : null,
           (x[0] === 'e' || x[0] === 'r') && (x[4] || x[5] || x[6]) ? el('ul', {class:'xmods'},
             (x[4] || []).map(([mod, tier]) => el('li', {class:tier >= 6 ? 'hi' : null}, mod, el('i', {}, 'T' + tier))),
@@ -780,7 +792,7 @@ LP ${lp} (1 in ${lpOdds(name, lp) || '?'} drops): ` + mods.map(m => `${m[0]} T${
         return el('div', {class:'idol-card' + (dimIdol(x) ? ' mine' : ''), style:`--c:${COLOR[x[0]]}`},
           tile(x, {card:'Idol', onclick:e => toggle('idols', x[1], e)}),
           el('div', {class:'t'}, el('b', {title:x[1]}, x[1]),
-            el('ul', {class:'imods'}, mods ? (mods.length ? mods.map(([m, tr]) => el('li', {}, m, el('i', {}, 'T' + tr))) : el('li', {class:'none'}, KIND[x[0]] === 'Unique' ? 'Unique idol' : 'No mods')) : el('li', {class:'none'}, 'Mods not captured'),
+            el('ul', {class:'imods'}, x[7] ? el('li', {class:'vr'}, varLabel(x[7])) : null, mods ? (mods.length ? mods.map(([m, tr]) => el('li', {}, m, el('i', {}, 'T' + tr))) : el('li', {class:'none'}, KIND[x[0]] === 'Unique' ? 'Unique idol' : 'No mods')) : el('li', {class:'none'}, 'Mods not captured'),
               cm ? el('li', {class:'cm', title:'Corruption mod'}, cm[0], el('i', {}, 'T' + cm[1])) : null)));
       })),
       el('a', {class:'ext', href:'https://www.lastepochtools.com' + r.h, target:'_blank', rel:'noopener', onclick:e => e.stopPropagation()}, 'Full profile on lastepochtools ↗'));

@@ -15,21 +15,23 @@ const builds = JSON.parse(fs.readFileSync('builds.json', 'utf8')).map(b => {
   return snaps.length ? { ...b, data: snaps[snaps.length - 1] } : null;
 }).filter(Boolean);
 
-// [name] -> per build [characters wearing it, LP counts 0..4]
+// [name] -> per build [characters wearing it, LP counts 0..4, {variant: characters}]
 const usage = {};
 builds.forEach((b, bi) => {
   b.data.rows.forEach(r => {
     if (r.ng) return;
-    const seen = new Map();
+    const seen = new Map(), vars = new Map();
     [...Object.values(r.e), ...r.i].forEach(x => {
       if (!'uls'.includes(x[0])) return;
       const lp = x[0] === 'l' && x[3] ? Math.min(4, x[3].length) : 0;
       seen.set(x[1], Math.max(seen.get(x[1]) ?? 0, lp));
+      if (x[7]) vars.set(x[1], x[7]);
     });
     for (const [name, lp] of seen) {
       const u = (usage[name] ??= []);
-      const c = (u[bi] ??= [0, [0, 0, 0, 0, 0]]);
+      const c = (u[bi] ??= [0, [0, 0, 0, 0, 0], {}]);
       c[0]++; c[1][lp]++;
+      const v = vars.get(name); if (v) c[2][v] = (c[2][v] || 0) + 1;
     }
   });
 });
