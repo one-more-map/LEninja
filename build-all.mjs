@@ -84,7 +84,7 @@ footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
 .fb{margin:10px 0 0}.fb a{color:var(--gold-hi);text-decoration:none;border-bottom:1px solid rgba(201,168,90,.35)}.fb a:hover{border-bottom-color:currentColor}
 </style></head>
 <body><div class="wrap">
-<header><div class="brand">LE NINJA</div><div class="sub">${esc(season)} &middot; corruption ladder builds</div><a class="uq" href="uniques.html">Browse every unique &amp; its LP odds &rarr;</a></header>
+<header><div class="brand">LE NINJA</div><div class="sub">${esc(season)} &middot; corruption ladder builds</div><div class="links"><a class="uq" href="meta.html">What the ladder is playing &rarr;</a> <a class="uq" href="uniques.html">Browse every unique &amp; its LP odds &rarr;</a></div></header>
 <div class="grid">
 ${cards}
 </div>
@@ -94,3 +94,4 @@ ${cards}
 fs.writeFileSync('index.html', html);
 console.log(`index.html: ${builds.length} builds`);
 execFileSync(process.execPath, ['build-uniques.mjs'], { stdio: 'inherit' });
+execFileSync(process.execPath, ['build-meta.mjs'], { stdio: 'inherit' });

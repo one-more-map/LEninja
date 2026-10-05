@@ -1,0 +1,270 @@
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LE Ninja Meta</title>
+<script data-goatcounter="https://leninja.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Same frost-and-gold look as the build and uniques pages: dark-only, gold-framed panels. */
+:root{
+  color-scheme:dark;
+  --void:#070a10; --panel:#0e131c; --panel-2:#131a26; --raised:#182131; --line:#212b3b;
+  --gold:#c9a45c; --gold-dim:#5e4c2c; --gold-hi:#efd59a; --rift:#62d6ea; --rift-dim:#1c4a56; --frost:#a9e6f2;
+  --text:#e2e7ef; --dim:#8a95a8; --faint:#5b6577;
+  /* base-class colours */
+  --c0:#86c46a; --c1:#7aa2ff; --c2:#e0b45a; --c3:#d06a7c; --c4:#4fc9a4;
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --ui:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,sans-serif;
+  --corners:
+    linear-gradient(var(--gold),var(--gold)) top left/14px 1px,linear-gradient(var(--gold),var(--gold)) top left/1px 14px,
+    linear-gradient(var(--gold),var(--gold)) top right/14px 1px,linear-gradient(var(--gold),var(--gold)) top right/1px 14px,
+    linear-gradient(var(--gold),var(--gold)) bottom left/14px 1px,linear-gradient(var(--gold),var(--gold)) bottom left/1px 14px,
+    linear-gradient(var(--gold),var(--gold)) bottom right/14px 1px,linear-gradient(var(--gold),var(--gold)) bottom right/1px 14px;
+}
+*{box-sizing:border-box}
+html{background:var(--void)}
+body{background:var(--void);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.4}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--rift);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(7,10,16,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--gold-dim)}
+.bar-in{max-width:1400px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;gap:16px}
+.brand{text-decoration:none;display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;letter-spacing:.06em;font-size:17px;color:var(--gold-hi)}
+.nav{display:flex;height:100%;margin:0 auto;font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.08em}
+.nav span,.nav a{display:flex;align-items:center;padding:0 18px;color:var(--dim);text-decoration:none}
+.nav .on{color:var(--frost);background:linear-gradient(180deg,transparent,rgba(98,214,234,.12));box-shadow:inset 0 -2px 0 var(--rift)}
+.bar .note{font-family:var(--ui);font-size:13px;color:var(--faint);white-space:nowrap}
+@media (max-width:760px){.bar .note{display:none}.nav{margin:0 0 0 auto;font-size:12px}.nav a{padding:0 8px}.bar-in{gap:8px}.brand{font-size:14px;gap:6px;white-space:nowrap}.brand svg{width:20px;height:20px}}
+@media (max-width:480px){.nav .nav-fb{display:none}}
+
+.hero{text-align:center;padding:28px 16px 26px;border-bottom:1px solid var(--line);
+  background:radial-gradient(600px 220px at 50% 70%,rgba(98,214,234,.14),transparent 70%),radial-gradient(900px 300px at 50% 0,rgba(201,164,92,.08),transparent 70%)}
+.eyebrow{font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+h1{margin:6px 0 0;font-family:var(--display);font-weight:600;font-size:clamp(34px,6vw,56px);letter-spacing:.06em;text-transform:uppercase;line-height:1;
+  background:linear-gradient(180deg,#f6e7c2,#c9a45c 70%,#8d6f37);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{max-width:62ch;margin:12px auto 0;color:var(--dim);font-size:15px;text-wrap:balance}
+
+.wrap{max-width:1400px;margin:0 auto;padding:18px 16px 120px}
+.frame{position:relative;background:var(--corners),linear-gradient(180deg,var(--panel-2),var(--panel));background-repeat:no-repeat;border:1px solid var(--gold-dim);border-radius:3px}
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:12px 14px;margin-bottom:16px}
+.lbl{font-family:var(--ui);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:3px 9px;cursor:pointer;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{color:var(--frost);border-color:var(--rift);background:rgba(98,214,234,.08)}
+.controls .hint{font-family:var(--ui);font-size:13px;color:var(--faint);margin-left:auto}
+
+.grid{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.phead{display:flex;align-items:baseline;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.phead h2{margin:0;font-family:var(--display);font-size:17px;font-weight:600;letter-spacing:.06em;color:var(--gold-hi)}
+.phead .cnt{font-family:var(--ui);color:var(--faint);font-size:13px}
+.phead .clr{margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:1px 8px;cursor:pointer;font-family:var(--ui);font-size:12px;color:var(--dim)}
+.phead .clr:hover{color:var(--frost);border-color:var(--rift-dim)}
+
+/* Mastery list */
+.mlist{display:grid;padding:6px}
+.m{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;text-align:left;border:1px solid transparent;background:none;border-radius:2px;padding:6px 8px;cursor:pointer}
+.m:hover{background:rgba(255,255,255,.025)}
+.m[aria-pressed="true"]{border-color:var(--rift-dim);background:rgba(98,214,234,.06)}
+.m .nm{font-family:var(--ui);font-size:15px;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.m .nm small{font-weight:500;color:var(--faint);margin-left:6px;font-size:12px}
+.m .num{font-family:var(--ui);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.m .num small{color:var(--faint);font-weight:500;margin-left:6px}
+.m .track{grid-column:1/-1;height:5px;background:rgba(255,255,255,.05);border-radius:1px;overflow:hidden}
+.m .track i{display:block;height:100%;border-radius:1px}
+.m .sub{grid-column:1/-1;font-family:var(--ui);font-size:12px;color:var(--faint)}
+.m .sub a{color:var(--gold-hi);text-decoration:none}
+.m.all .nm{color:var(--text)}
+
+/* Skill filter */
+.skills{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px}
+.sk{position:relative;display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);border-radius:2px;padding:3px 8px 3px 3px;cursor:pointer;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--dim);overflow:hidden}
+.sk .fill{position:absolute;left:0;bottom:0;height:2px;background:var(--rift-dim)}
+.sk img,.sk .ph{width:22px;height:22px;border-radius:2px;flex:none}
+.sk .ph{display:grid;place-items:center;background:var(--raised);color:var(--faint);font-size:10px}
+.sk b{font-weight:500;color:var(--faint);font-variant-numeric:tabular-nums}
+.sk:hover{color:var(--text)}
+.sk[aria-pressed="true"]{color:var(--frost);border-color:var(--rift);background:rgba(98,214,234,.08)}
+.sk[aria-pressed="true"] .fill{background:var(--rift)}
+.sk:disabled{opacity:.35;cursor:default}
+.empty{padding:14px;color:var(--faint);font-family:var(--ui)}
+
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;padding:12px 14px;border-top:1px solid var(--line)}
+.stat{display:flex;flex-direction:column}
+.stat dt{font-family:var(--ui);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.stat dd{margin:0;font-family:var(--ui);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.summary .page{align-self:center;margin-left:auto;font-family:var(--ui);font-size:14px;font-weight:600;color:var(--gold-hi);text-decoration:none;border:1px solid var(--gold-dim);border-radius:2px;padding:4px 10px}
+.summary .page:hover{border-color:var(--gold)}
+
+/* Setups */
+.setups{display:grid}
+.st{display:grid;grid-template-columns:28px minmax(0,1fr) repeat(3,auto);gap:4px 16px;align-items:center;padding:9px 14px;border-bottom:1px solid rgba(33,43,59,.6)}
+.st:last-child{border-bottom:0}
+.st .i{font-family:var(--ui);color:var(--faint);font-variant-numeric:tabular-nums}
+.st .who{min-width:0}
+.st .who .ms{font-family:var(--ui);font-size:14px;font-weight:600}
+.st .who .ms a{color:var(--gold-hi);text-decoration:none;font-weight:500;font-size:13px;margin-left:8px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chip{display:flex;align-items:center;gap:4px;font-family:var(--ui);font-size:12px;color:var(--dim);background:var(--raised);border-radius:2px;padding:1px 6px 1px 1px}
+.chip img,.chip .ph{width:18px;height:18px;border-radius:2px}
+.chip .ph{display:grid;place-items:center;background:var(--panel);color:var(--faint);font-size:9px}
+.chip.req{color:var(--frost);box-shadow:inset 0 0 0 1px var(--rift-dim)}
+.st .v{text-align:right;font-family:var(--ui);font-variant-numeric:tabular-nums}
+.st .v b{display:block;font-size:16px;font-weight:600}
+.st .v small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+@media (max-width:620px){.st{grid-template-columns:22px repeat(3,minmax(0,1fr))}.st .who{grid-column:2/-1}.st .v{text-align:left}.st .v:nth-of-type(1){grid-column:2}}
+
+footer{margin-top:28px;text-align:center;font-size:13px;color:var(--faint)}
+.fb{margin:10px 0 0}.fb a{color:var(--gold-hi);text-decoration:none;border-bottom:1px solid rgba(201,168,90,.35)}.fb a:hover{border-bottom-color:currentColor}
+</style>
+
+<div class="bar"><div class="bar-in">
+  <a class="brand" href="index.html" title="All builds">
+    <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#c9a45c" stroke-width="1.2"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="#62d6ea" stroke-width=".8" stroke-dasharray="1.5 2.4"/><path d="M12 5.5V12l4 2.6" fill="none" stroke="#efd59a" stroke-width="1.6" stroke-linecap="round"/></svg>
+    LE NINJA
+  </a>
+  <nav class="nav" aria-label="Sections"><a href="index.html">BUILDS</a><a class="on" href="meta.html">META</a><a href="uniques.html">UNIQUES</a><a class="nav-fb" href="https://github.com/one-more-map/LEninja/issues" target="_blank" rel="noopener" title="Report a bug or suggest a feature on GitHub">FEEDBACK</a></nav>
+  <span class="note" id="note"></span>
+</div></div>
+
+<header class="hero">
+  <div class="eyebrow" id="eyebrow">Season 5 &middot; Rage of the Frostborn</div>
+  <h1>Meta</h1>
+  <p class="lede">What the top of the corruption ladder is playing. Pick a mastery, then click skills to narrow it down to a build and see how many players run it and how high they push.</p>
+</header>
+
+<main class="wrap">
+  <div class="controls frame">
+    <span class="lbl">Ladder</span>
+    <div class="seg" id="range" role="group" aria-label="Ladder range"></div>
+    <span class="hint" id="hint"></span>
+  </div>
+  <div class="grid">
+    <section class="frame" aria-labelledby="mh">
+      <div class="phead"><h2 id="mh">Masteries</h2><span class="cnt" id="mcnt"></span></div>
+      <div class="mlist" id="masteries"></div>
+    </section>
+    <div style="display:grid;gap:16px;min-width:0">
+      <section class="frame" aria-labelledby="sh">
+        <div class="phead"><h2 id="sh">Skills</h2><span class="cnt" id="scnt"></span><button class="clr" id="clear" hidden>Clear skills</button></div>
+        <div id="skills"></div>
+        <dl class="summary" id="summary"></dl>
+      </section>
+      <section class="frame" aria-labelledby="th">
+        <div class="phead"><h2 id="th">Most played setups</h2><span class="cnt" id="tcnt"></span></div>
+        <div class="setups" id="setups"></div>
+      </section>
+    </div>
+  </div>
+  <footer>Ranks, masteries and equipped skills for the top 10,000 characters on the softcore solo corruption ladder. A setup is a character's full set of equipped skills. Data from lastepochtools.com &middot; skill art &copy; Eleventh Hour Games<p class="fb">Found a bug or have an idea? <a href="https://github.com/one-more-map/LEninja/issues/new?labels=bug&amp;title=Bug%3A%20" target="_blank" rel="noopener">Report a bug</a> &middot; <a href="https://github.com/one-more-map/LEninja/issues/new?labels=enhancement&amp;title=Feature%3A%20" target="_blank" rel="noopener">Suggest a feature</a> &middot; <a href="https://github.com/one-more-map/LEninja" target="_blank" rel="noopener">GitHub</a></p></footer>
+</main>
+
+<!--DATA-->
+<script>
+const J = id => JSON.parse(document.getElementById(id).textContent);
+const D = J('ladder'), BUILDS = J('builds'), ICONS = J('icons');
+const BASE = ['Primalist', 'Mage', 'Sentinel', 'Acolyte', 'Rogue'];
+const MAST = [['Beastmaster', 'Shaman', 'Druid'], ['Sorcerer', 'Spellblade', 'Runemaster'], ['Void Knight', 'Forge Guard', 'Paladin'], ['Necromancer', 'Lich', 'Warlock'], ['Bladedancer', 'Marksman', 'Falconer']];
+const mName = c => c % 10 ? MAST[Math.floor(c / 10)][c % 10 - 1] : BASE[Math.floor(c / 10)] + ' (no mastery)';
+const mColor = c => `var(--c${Math.floor(c / 10)})`;
+const fmt = n => n.toLocaleString('en-US');
+const el = (tag, attrs, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) if (v != null && v !== false) k === 'style' ? e.style.cssText = v : k.startsWith('on') ? e.addEventListener(k.slice(2), v) : e.setAttribute(k, v === true ? '' : v);
+  for (const k of kids.flat()) if (k != null && k !== false) e.append(k);
+  return e;
+};
+
+// Rebuild rows: scores are delta-encoded in rank order; k points into the setup table u = [[classCode, ...skillIdx]].
+let sc = 0;
+const ROWS = D.k.map((k, i) => { sc = i ? sc - D.d[i] : D.d[0]; return { rank: i + 1, score: sc, level: D.l[i], cls: D.u[k][0], sk: D.u[k].slice(1), setup: k }; });
+const sIdx = Object.fromEntries(D.s.map((n, i) => [n, i]));
+// Each build page = mastery + required skills
+const PAGES = BUILDS.map(b => ({ ...b, req: b.skills.map(n => sIdx[n]).filter(i => i != null) }));
+const pageFor = (cls, sk) => PAGES.find(p => p.cls === cls && p.req.every(i => sk.includes(i)));
+
+const icon = (n, cls) => ICONS[n] ? el('img', { src: ICONS[n], alt: '', loading: 'lazy' }) : el('span', { class: 'ph', 'aria-hidden': 'true' }, n.split(/\s+/).map(w => w[0]).join('').slice(0, 2));
+
+const RANGES = [100, 500, 1000, 5000, 10000];
+const st = { n: 1000, cls: null, req: [] };
+try { const s = JSON.parse(localStorage.getItem('leninja-meta') || 'null'); if (s && RANGES.includes(s.n)) st.n = s.n; } catch {}
+const save = () => { try { localStorage.setItem('leninja-meta', JSON.stringify({ n: st.n })); } catch {} };
+
+const median = a => { const s = a.slice().sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : 0; };
+
+function render() {
+  const pool = ROWS.slice(0, st.n);
+  // Range buttons
+  const rg = document.getElementById('range'); rg.replaceChildren(...RANGES.map(n => el('button', { 'aria-pressed': String(st.n === n), onclick: () => { st.n = n; save(); render(); } }, 'Top ' + fmt(n))));
+  document.getElementById('hint').textContent = `Lowest corruption in range: ${fmt(pool[pool.length - 1].score)}`;
+
+  // Masteries
+  const by = new Map(); pool.forEach(r => { const m = by.get(r.cls) || by.set(r.cls, { n: 0, best: r.rank, top: r.score }).get(r.cls); m.n++; });
+  const ms = [...by].filter(([c]) => c % 10).sort((a, b) => b[1].n - a[1].n);
+  const max = ms[0][1].n;
+  document.getElementById('mcnt').textContent = `${ms.length} masteries`;
+  const all = el('button', { class: 'm all', 'aria-pressed': String(st.cls == null), onclick: () => { st.cls = null; st.req = []; render(); } },
+    el('span', { class: 'nm' }, 'All masteries'), el('span', { class: 'num' }, fmt(pool.length)));
+  document.getElementById('masteries').replaceChildren(all, ...ms.map(([c, m]) => {
+    const pages = PAGES.filter(p => p.cls === c);
+    return el('button', { class: 'm', 'aria-pressed': String(st.cls === c), onclick: () => { st.cls = st.cls === c ? null : c; st.req = []; render(); } },
+      el('span', { class: 'nm', style: `color:${mColor(c)}` }, mName(c), el('small', {}, BASE[Math.floor(c / 10)])),
+      el('span', { class: 'num' }, fmt(m.n), el('small', {}, (m.n / pool.length * 100).toFixed(1) + '%')),
+      el('span', { class: 'track' }, el('i', { style: `width:${m.n / max * 100}%;background:${mColor(c)}` })),
+      el('span', { class: 'sub' }, `Best #${fmt(m.best)} · ${fmt(m.top)} corruption`, pages.length ? ` · ${pages.length} build page${pages.length > 1 ? 's' : ''}` : ''));
+  }));
+
+  // Skills for the chosen mastery, % of its characters using each
+  const mrows = st.cls == null ? pool : pool.filter(r => r.cls === st.cls);
+  const match = mrows.filter(r => st.req.every(i => r.sk.includes(i)));
+  const sb = document.getElementById('skills'), clr = document.getElementById('clear');
+  clr.hidden = !st.req.length; clr.onclick = () => { st.req = []; render(); };
+  if (st.cls == null) {
+    sb.replaceChildren(el('p', { class: 'empty' }, 'Pick a mastery to filter by its skills.'));
+    document.getElementById('scnt').textContent = '';
+  } else {
+    const use = new Map(); match.forEach(r => r.sk.forEach(i => use.set(i, (use.get(i) || 0) + 1)));
+    const base = new Map(); mrows.forEach(r => r.sk.forEach(i => base.set(i, (base.get(i) || 0) + 1)));
+    const list = [...base].sort((a, b) => (use.get(b[0]) || 0) - (use.get(a[0]) || 0) || b[1] - a[1]).filter(([i, n]) => n / mrows.length >= 0.01 || st.req.includes(i));
+    document.getElementById('scnt').textContent = `${mName(st.cls)} · % of ${st.req.length ? 'matching' : 'all'} characters using each`;
+    sb.replaceChildren(el('div', { class: 'skills' }, list.map(([i]) => {
+      const n = use.get(i) || 0, on = st.req.includes(i), p = match.length ? n / match.length * 100 : 0;
+      return el('button', { class: 'sk', 'aria-pressed': String(on), disabled: !on && !n, title: `${fmt(n)} of ${fmt(match.length)}`,
+        onclick: () => { st.req = on ? st.req.filter(x => x !== i) : [...st.req, i]; render(); } },
+        icon(D.s[i]), D.s[i], el('b', {}, Math.round(p) + '%'), el('span', { class: 'fill', style: `width:${p}%` }));
+    })));
+  }
+
+  // Summary of the current selection
+  const page = st.cls != null && st.req.length ? PAGES.find(p => p.cls === st.cls && p.req.length === st.req.length && p.req.every(i => st.req.includes(i))) : null;
+  const sum = document.getElementById('summary');
+  const stat = (k, v) => el('div', { class: 'stat' }, el('dt', {}, k), el('dd', {}, v));
+  sum.replaceChildren(...[
+    stat('Characters', fmt(match.length)),
+    stat(st.cls == null ? 'Of ladder' : 'Of mastery', mrows.length ? Math.round(match.length / mrows.length * 100) + '%' : '-'),
+    stat('Best rank', match.length ? '#' + fmt(match[0].rank) : '-'),
+    stat('Top corruption', match.length ? fmt(match[0].score) : '-'),
+    stat('Median', match.length ? fmt(median(match.map(r => r.score))) : '-'),
+    stat('In top 100', fmt(match.filter(r => r.rank <= 100).length)),
+    page ? el('a', { class: 'page', href: page.out }, 'Gear for this build →') : null].filter(Boolean));
+
+  // Setups: full equipped-skill sets among matching characters
+  const g = new Map(); match.forEach(r => { const s = g.get(r.setup) || g.set(r.setup, { r, n: 0, sc: [] }).get(r.setup); s.n++; s.sc.push(r.score); });
+  const top = [...g.values()].sort((a, b) => b.n - a.n || a.r.rank - b.r.rank).slice(0, 15);
+  document.getElementById('tcnt').textContent = `${fmt(g.size)} distinct · showing ${top.length}`;
+  document.getElementById('setups').replaceChildren(...(top.length ? top.map((s, i) => {
+    const p = pageFor(s.r.cls, s.r.sk);
+    return el('div', { class: 'st' },
+      el('span', { class: 'i' }, i + 1),
+      el('div', { class: 'who' },
+        el('div', { class: 'ms', style: `color:${mColor(s.r.cls)}` }, mName(s.r.cls), p ? el('a', { href: p.out }, 'Build page →') : null),
+        el('div', { class: 'chips' }, s.r.sk.slice().sort((a, b) => st.req.includes(b) - st.req.includes(a) || D.s[a].localeCompare(D.s[b])).map(k => el('span', { class: 'chip' + (st.req.includes(k) ? ' req' : '') }, icon(D.s[k]), D.s[k])))),
+      el('div', { class: 'v' }, el('b', {}, fmt(s.n)), el('small', {}, 'players')),
+      el('div', { class: 'v' }, el('b', {}, '#' + fmt(s.r.rank)), el('small', {}, 'best')),
+      el('div', { class: 'v' }, el('b', {}, fmt(median(s.sc))), el('small', {}, 'median')));
+  }) : [el('p', { class: 'empty' }, 'No characters match.')]));
+}
+document.getElementById('note').textContent = 'Ladder fetched ' + new Date(D.fetchedAt).toISOString().slice(0, 10);
+render();
+</script>
